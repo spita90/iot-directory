@@ -113,7 +113,9 @@ if ($action=="insert")
 		if ($protocol == 'ngsi w/MultiService' && count($services) > 0){
 
 			// regex for syntax checking
-			$serviceRegex = "/^([a-z]|_){1,25}$/";
+			//$serviceRegex = "/^([a-z]|_){1,25}$/";
+			//ANDREA FIX
+            $serviceRegex = "/^([a-z]|_|[0-9]){1,50}$/";
 
 			for($i = 0; $i < count($services); $i++){
 				$service = $services[$i];
@@ -270,7 +272,9 @@ if ($action=="update")
 		if ($protocol == 'ngsi w/MultiService' && count($services) > 0) {
 
 			// Regex for Syntax Checking
-			$serviceRegex = "/^([a-z]|_){1,25}$/";
+			//$serviceRegex = "/^([a-z]|_){1,25}$/";
+			//ANDREA FIX
+            $serviceRegex = "/^([a-z]|_|[0-9]){1,50}$/";
 
 			// insert new services
 			for($i = 0; $i < count($services); $i++){
