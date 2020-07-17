@@ -399,7 +399,9 @@ function checkCbServices(){
         } else {
             //console.log("più services");
 
-            var serviceRegex = /^([a-z]|_){1,25}$/;
+            //var serviceRegex = /^([a-z]|_){1,25}$/;
+            //ANDREA FIX
+            var serviceRegex = /^([a-z]|_|[0-9]){1,50}$/;
             for(const value of values){
                 if(!serviceRegex.test(value)){
                     message = `Check your values <br>

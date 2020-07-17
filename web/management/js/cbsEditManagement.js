@@ -321,14 +321,16 @@ function checkEditCbServices(){
         if (values.length == 1){
             //console.log("un solo service");
 
-            var serviceRegex = /^([a-z]|_){1,25}$/;
+            //var serviceRegex = /^([a-z]|_){1,25}$/;
+            //ANDREA FIX
+            var serviceRegex = /^([a-z]|_|[0-9]){1,50}$/;
             if (values[0] !== "" && !serviceRegex.test(values[0])) {
                 message = `Check your values <br>
                         <ul>
                             <li>white spaces are not allowed</li>
                             <li>use only lower case letters</li>
                             <li>special characters are not allowed (except for "_")</li>
-                            <li>service/tenant name must not be longer than 25 characters</li>
+                            <li>service/tenant name must not be longer than 50 characters</li>
                         </ul>`;
                 editCbConditionsArray['inputServicesCBM'] = false;
                 $("#editInputServiceCBMsg").removeClass("alert alert-info");
