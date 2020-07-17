@@ -121,7 +121,7 @@ var xhttp = new XMLHttpRequest();
 
 retrieveData(xhttp, link);
 
-function retrieveData(xtp, link){
+function retrieveData(xhttp, link){
 	var promiseAcquisition = new Promise(function(resolve2, reject){	
 		xhttp = new XMLHttpRequest();  
 

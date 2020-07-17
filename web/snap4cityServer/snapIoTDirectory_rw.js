@@ -170,7 +170,10 @@ router.route('/extract')
 		];
 	
 		console.log("invoking extract");
-	
+
+		//ANDREA log purpose
+		//console.log(args);
+
 		const child_ngsi = spawn('node',args, {stdio: 'pipe' });
 	
 		registeredStub.set(req.body.contextbroker, child_ngsi);	

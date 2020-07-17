@@ -2696,7 +2696,7 @@ function activateStub(cb,deviceName, ipa,protocol,user,accesslink,accessport,mod
             confirm("The Context Broker "+ cb+" is not reacheable");
         }
 	else if(resp.message.indexOf("path malformed")==0){
-            confirm("The Context Broker "+ cb+" contains an access path malformed");
+            confirm("The Context Broker "+ cb+" contains a malformed access path");
         }
 	else if(resp.message.indexOf("extraction rules not found")==0){
             confirm("No extraction rules have been defined for the Context Broker "+ cb);
