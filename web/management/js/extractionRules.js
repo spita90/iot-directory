@@ -96,18 +96,27 @@ $.ajax({url: "../api/extractionRules.php",
 							$dataType.append($("<option />").val(gb_datatypes[n]).text(gb_datatypes[n]));
 						}
 
+						// ANDREA - FIX - now it fetches value_types and value_units from web service or json, and when
+						// a value type is selected, only related value units are shown.
+
 						var $valueType = $("#valueTypeInput");
                         $valueType.empty();
 						$valueType.append($("<option />").text(""));
 						for (let n=0; n < gb_value_types.length; n++){
-							$valueType.append($("<option />").val(gb_value_types[n].label).text(gb_value_types[n].value));
+							$valueType.append($("<option />").val(gb_value_types[n].value).text(gb_value_types[n].label));
 						}
 
 						var $valueUnit = $("#deviceValueUnit");
-                        $valueUnit.empty();
-						for (let n=0; n < gb_value_units.length; n++){
-							$valueUnit.append($("<option />").val(gb_value_units[n].label).text(gb_value_units[n].value));
-						}
+						$valueUnit.empty();
+
+						$valueType.change(function(){
+							$valueUnit.empty();
+							for (let n=0; n < gb_value_units.length; n++){
+								if(gb_value_units[n].parent_value.includes($valueType.val())){
+									$valueUnit.append($("<option />").val(gb_value_units[n].value).text(gb_value_units[n].label));
+								}
+							}
+						});
 
                         var $dropdown = $("#selectContextBroker");        
                         $dropdown.empty();
@@ -141,6 +150,8 @@ $.ajax({url: "../api/extractionRules.php",
    });
 
 //Sara811 - end
+
+
 
 //-----------------------------------------------------------------------------//
 
