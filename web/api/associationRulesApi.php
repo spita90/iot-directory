@@ -1730,16 +1730,37 @@ else if($action == 'apply_rules'){
 	mysqli_close($link); 
 }
 else if($action == 'get_param_values')
-{	
-	// $result = array();
-	$result['status'] = 'ok'; 
-	$result['value_type'] = generatelabels($link);
+{
+    $result = array();
+	$result['status'] = 'ok';
 	$result['data_type'] = generatedatatypes($link);
-	$result['value_unit'] = generateunits($link);
-	//$result['log'] .= '\n\naction:get_param_values';
-	my_log($result);
-	mysqli_close($link); 
+	mysqli_close($link);
 
+	$newresult=array("status"=>"","msg"=>"","content"=>"","log"=>"", "error_msg"=>"");
+    $newresult['status'] = 'ok';
+
+	retrieveFromDictionary("value%20type", $newresult);
+    	if ($newresult["status"]=='ok'){
+    		$result['value_type'] = $newresult["content"];
+    		retrieveFromDictionary("value%20unit", $newresult);
+    		if ($newresult["status"]=='ok'){
+    			$result['value_unit'] = $newresult["content"];
+    		}
+    		else{
+    			$result['status'] = 'ko';
+    			$result['error_msg'] = 'Problem contacting the Snap4City server (Dictionary). Please try later';
+    			$result['log'] .= '\n Problem contacting the Snap4City server (Dictionary value unit)';
+    		}
+    	}
+    	else {
+    		$result['status'] = 'ko';
+    		$result['error_msg'] = 'Problem contacting the Snap4City server (Dictionary). Please try later';
+    		$result['log'] .= '\n Problem contacting the Snap4City server (Dictionary value type)';
+    	}
+    /*
+	//$result['log'] .= '\n\naction:get_param_values';
+	*/
+    my_log($result);
 }
 
 //----Sara end---

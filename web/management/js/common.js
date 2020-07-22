@@ -578,7 +578,7 @@ function checkServicePath(value, mode, context) {
         case 0:
         case 1:
 
-            // In this case, following operations are made only for graphical pourpose
+            // In this case, following operations are made only for graphical purpose
             // During model creation, these operations must be done before sending data to server
             var valueToPrint = value;
             // console.log(valueToPrint);

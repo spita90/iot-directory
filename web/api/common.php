@@ -1322,7 +1322,8 @@ function checkOwnershipObject($token, $elementId, $elementType, &$result)
     return $toreturn;
 }
 
-
+//ANDREA FIX NO MORE USED - instead of the tables, we get those info from a web service or a local json.
+/*
 function generatelabels($link) {
      $query2 = "SELECT value_type FROM value_types ORDER BY value_type";
      $res = mysqli_query($link, $query2) or die(mysqli_error($link));
@@ -1348,6 +1349,7 @@ function generateunits($link) {
      }
          return $labels;
 }
+*/
 
 function retrieveFromDictionary($type,&$result){
 

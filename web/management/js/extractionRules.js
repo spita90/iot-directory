@@ -45,7 +45,6 @@ function ajaxRequest()
 //--------to get the models with their details----------------------//
 
 
-
 $.ajax({url: "../api/extractionRules.php",
          data: {
 			 action: 'get_param_values',
@@ -66,6 +65,7 @@ $.ajax({url: "../api/extractionRules.php",
 		   alert("Network errors. <br/> Get in touch with the Snap4City Administrator<br/>"+ JSON.stringify(mydata));
 		 }
 });
+
 //--------------------Ajax call function to upload file data---------------------//
 
 //Sara811 - Start
@@ -91,31 +91,29 @@ $.ajax({url: "../api/extractionRules.php",
                     {   
 						var $dataType = $("#deviceTypeInput");        
                         $dataType.empty();
-						$dataType.append($("<option />").text(""));  								
-                        $.each(gb_datatypes, function() {
-							$dataType.append($("<option />").val(this).text(this));  								
-                        });
-						
-						var $valueType = $("#valueTypeInput");        
-                        $valueType.empty();
-						$valueType.append($("<option />").text(""));  								
-                        $.each(gb_value_types, function() {
-							$valueType.append($("<option />").val(this).text(this));  								
-                        });
+						$dataType.append($("<option />").text(""));
+						for (let n=0; n < gb_datatypes.length; n++){
+							$dataType.append($("<option />").val(gb_datatypes[n]).text(gb_datatypes[n]));
+						}
 
-						var $valueUnit = $("#deviceValueUnit");        
+						var $valueType = $("#valueTypeInput");
+                        $valueType.empty();
+						$valueType.append($("<option />").text(""));
+						for (let n=0; n < gb_value_types.length; n++){
+							$valueType.append($("<option />").val(gb_value_types[n].label).text(gb_value_types[n].value));
+						}
+
+						var $valueUnit = $("#deviceValueUnit");
                         $valueUnit.empty();
-                        $.each(gb_value_units, function() {
-							$valueUnit.append($("<option />").val(this).text(this));  								
-                        });
-						
+						for (let n=0; n < gb_value_units.length; n++){
+							$valueUnit.append($("<option />").val(gb_value_units[n].label).text(gb_value_units[n].value));
+						}
+
                         var $dropdown = $("#selectContextBroker");        
                         $dropdown.empty();
                         $.each(data['content_cb'], function() {
-							$dropdown.append($("<option />").val(this.name).text(this.name));  						
+							$dropdown.append($("<option />").val(this.name).text(this.name));
                         });
-						
-						
                         
                           $("#addDeviceModalBody").show();
                           $("#addDeviceLoadingMsg").hide();

@@ -377,7 +377,7 @@ function checkCbServices(){
             //console.log("un solo service");
 
             //var serviceRegex = /^([a-z]|_){1,25}$/;
-            //ANDREA FIX
+            //ANDREA FIX regex
             var serviceRegex = /^([a-z]|_|[0-9]){1,50}$/;
             if(values[0] !== "" && !serviceRegex.test(values[0])){
                 message = `Check your values <br>
@@ -402,7 +402,7 @@ function checkCbServices(){
             //console.log("più services");
 
             //var serviceRegex = /^([a-z]|_){1,25}$/;
-            //ANDREA FIX
+            //ANDREA FIX regex
             var serviceRegex = /^([a-z]|_|[0-9]){1,50}$/;
             for(const value of values){
                 if(!serviceRegex.test(value)){

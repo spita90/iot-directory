@@ -114,7 +114,7 @@ if ($action=="insert")
 
 			// regex for syntax checking
 			//$serviceRegex = "/^([a-z]|_){1,25}$/";
-			//ANDREA FIX
+			//ANDREA FIX regex
             $serviceRegex = "/^([a-z]|_|[0-9]){1,50}$/";
 
 			for($i = 0; $i < count($services); $i++){
@@ -273,7 +273,7 @@ if ($action=="update")
 
 			// Regex for Syntax Checking
 			//$serviceRegex = "/^([a-z]|_){1,25}$/";
-			//ANDREA FIX
+			//ANDREA FIX regex
             $serviceRegex = "/^([a-z]|_|[0-9]){1,50}$/";
 
 			// insert new services
