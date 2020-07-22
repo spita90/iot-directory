@@ -1012,6 +1012,12 @@ $('#devicesTable thead').css("font-size", "1em");
 		$('#addDeviceLoadingMsg').show();
 		$('#addDeviceLoadingIcon').show();
 
+		if ($('#selectKindDevice').val() == "property") {
+			$('#deviceTypeInput').empty();
+			$('#valueTypeInput').empty();
+			$('#deviceValueUnit').empty();
+		}
+
 	$.ajax({
 		 url: "../api/extractionRules.php",
 		 data:{
