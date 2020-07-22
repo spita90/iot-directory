@@ -10,7 +10,9 @@ function showEditDeviceModal()
 	editRuleConditionsArray['kind'] = false;
 	editRuleConditionsArray['selector'] = false;
 	editRuleConditionsArray['nameRule'] = false;
-
+    editRuleConditionsArray['dataType'] = false;
+    editRuleConditionsArray['valueType'] = false;
+    editRuleConditionsArray['valueUnit'] = false;
 	
 	$("#editRuleConfirmBtn").attr("disabled", true);
 	
@@ -25,17 +27,28 @@ function showEditDeviceModal()
 
     $("#editInfoTabDevice #inputFormatM").on('input', checkSelectionFormatM);
 	$("#editInfoTabDevice #inputFormatM").on('input', checkEditDeviceConditions);
-	
+
     $("#editInfoTabDevice #inputSelectorM").on('input', checkSelectorM);
 	$("#editInfoTabDevice #inputSelectorM").on('input', checkEditDeviceConditions);
 
+    $("#editInfoTabDevice #inputDataTypeM").on('change', checkDataTypeM);
+    $("#editInfoTabDevice #inputDataTypeM").on('change', checkEditDeviceConditions);
+
+    $("#editInfoTabDevice #inputValueTypeM").on('change', checkValueTypeM);
+    $("#editInfoTabDevice #inputValueTypeM").on('change', checkEditDeviceConditions);
+
+    $("#editInfoTabDevice #valueUnitDeviceM").on('change', checkValueUnitM);
+    $("#editInfoTabDevice #valueUnitDeviceM").on('change', checkEditDeviceConditions);
 	
 	checkRuleNameM();
 	checkSelectionKindM();
 	checkSelectionCBM(); 
 	checkSelectionFormatM();
 	checkSelectorM();
-  
+    checkDataTypeM();
+    checkValueTypeM();
+    checkValueUnitM();
+
 	$("#editDeviceModal").modal('show');
 	
 }
@@ -75,7 +88,7 @@ function checkSelectionKindM()
 	else if($("#editInfoTabDevice #selectKindDeviceM").val().localeCompare("value")==0){
 		 $("#dataTypeSelM").show();
 		 $("#valueTypeSelM").show();
-		 $("#valueUnitSelM").show();		
+		 $("#valueUnitSelM").show();
 	}
 
 	editRuleConditionsArray['kind'] = true;
@@ -166,8 +179,46 @@ function checkRuleNameM()
     
     $("#inputNameRuleMMsg").html(message);
 }
+function checkDataTypeM()
+{
+    /*
+    //TODO - ANDREA - implement control on data type
+    var message = null;
 
-	
+    if($("#editInfoTabDevice #inputSelectorM").val().length === 0)
+    {
+        $("#inputSelectorMMsg").css("color", "red");
+        message = 'Selector is mandatory';
+        editRuleConditionsArray['selector'] = false;
+    }
+    else
+    {
+        $("#inputSelectorMMsg").css("color", "#337ab7");
+        message = 'Ok';
+        editRuleConditionsArray['selector'] = true;
+
+    }
+
+    $("#inputSelectorMMsg").html(message);
+
+     */
+    editRuleConditionsArray['dataType'] = true;
+}
+
+function checkValueTypeM() {
+
+    //TODO - ANDREA - implement control on value type
+
+    editRuleConditionsArray['valueType'] = true;
+}
+
+function checkValueUnitM() {
+
+    //TODO - ANDREA - implement control on value unit
+
+    editRuleConditionsArray['valueUnit'] = true;
+}
+
 function checkEditDeviceConditions()
 {
     var enableButton = true;

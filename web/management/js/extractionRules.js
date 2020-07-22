@@ -686,32 +686,31 @@ $('#devicesTable tbody').on('click', 'button.editDashBtn', function () {
 	$("#editDeviceOkMsg").hide();
 	$("#editDeviceOkIcon").hide();
 	$("#editDeviceKoMsg").hide();
-	$("#editDeviceKoIcon").hide(); 
+	$("#editDeviceKoIcon").hide();
 	$("#editDeviceModalFooter").show();
 	$("#editDeviceModalLabel").html("Edit device - " + $(this).attr("data-id"));
 	$("#editDeviceModal").modal('show');
-	  
-	   
+
+
 	var id = $(this).attr('data-id');
-		gb_old_id = id;
+	gb_old_id = id;
 	var contextbroker = $(this).attr('data-contextBroker');
-			gb_old_cb = contextbroker;
+	gb_old_cb = contextbroker;
 	var kind = $(this).attr('data-kind');
-	if(kind.localeCompare("property")==0){
-		 $("#dataTypeSelM").hide();
-		 $("#valueTypeSelM").hide();
-		 $("#valueUnitSelM").hide();
-	}
-	else if(kind.localeCompare("value")==0){
-		 $("#dataTypeSelM").show();
-		 $("#valueTypeSelM").show();
-		 $("#valueUnitSelM").show();		
+	if (kind.localeCompare("property") == 0) {
+		$("#dataTypeSelM").hide();
+		$("#valueTypeSelM").hide();
+		$("#valueUnitSelM").hide();
+	} else if (kind.localeCompare("value") == 0) {
+		$("#dataTypeSelM").show();
+		$("#valueTypeSelM").show();
+		$("#valueUnitSelM").show();
 	}
 	var selector = $(this).attr('data-selector');
 	selector = selector.replace(/'/g, '\"');
 
 	var format = $(this).attr('data-format');
-	var data_type =$(this).attr('data-d-type');
+	var data_type = $(this).attr('data-d-type');
 	var value_type = $(this).attr('data-value-type');
 	var value_unit = $(this).attr('data-value-unit');
 	var structure_flag = $(this).attr('data-structure-flag');
@@ -727,33 +726,48 @@ $('#devicesTable tbody').on('click', 'button.editDashBtn', function () {
 	$('#valueUnitDeviceM').val(value_unit);
 	$('#structureValueFlagM').val(structure_flag);
 
-	var $dataType = $("#inputDataTypeM");        
+	var $dataType = $("#inputDataTypeM");
 	$dataType.empty();
-	$dataType.append($("<option />").text(""));  	
-    $dataType.append($("<option selected/>").val(data_type).text(data_type));	
-	$.each(gb_datatypes, function() {
-        if(this != data_type)
-		$dataType.append($("<option />").val(this).text(this));  								
-	});
-	
-	var $valueType = $("#inputValueTypeM");        
-	$valueType.empty();
-	$valueType.append($("<option />").text(""));  
-    $valueType.append($("<option selected/>").val(value_type).text(value_type));		
-	$.each(gb_value_types, function() {
-        if(this != value_type)
-		$valueType.append($("<option />").val(this).text(this));  								
+	$dataType.append($("<option />").text(""));
+	$dataType.append($("<option selected/>").val(data_type).text(data_type));
+	$.each(gb_datatypes, function () {
+		if (this != data_type)
+			$dataType.append($("<option />").val(this).text(this));
 	});
 
-	var $valueUnit = $("#valueUnitDeviceM");        
+	var $valueType = $("#inputValueTypeM");
+	$valueType.empty();
+	$valueType.append($("<option />").text(""));
+	for (let n = 0; n < gb_value_types.length; n++) {
+		if (gb_value_types[n].value != value_type) {
+			$valueType.append($("<option />").val(gb_value_types[n].value).text(gb_value_types[n].label));
+		} else {
+			$valueType.append($("<option selected/>").val(gb_value_types[n].value).text(gb_value_types[n].label));
+		}
+	}
+
+	var $valueUnit = $("#valueUnitDeviceM");
 	$valueUnit.empty();
-    $valueUnit.append($("<option selected/>").val(value_unit).text(value_unit));		
-	$.each(gb_value_units, function() {
-        if(this != value_unit)
-		$valueUnit.append($("<option />").val(this).text(this));  								
+
+
+	$valueType.change(function () {
+		$valueUnit.empty();
+		for (let n = 0; n < gb_value_units.length; n++) {
+			if (gb_value_units[n].parent_value.includes($valueType.val())) {
+				if (gb_value_units[n].value != value_unit) {
+					$valueUnit.append($("<option />").val(gb_value_units[n].value).text(gb_value_units[n].label));
+				} else {
+					$valueUnit.append($("<option selected/>").val(gb_value_units[n].value).text(gb_value_units[n].label));
+				}
+			}
+		}
 	});
+
+	$valueType.trigger("change");
+
 	//sara -> could be a problem
-	$('#editDeviceModal').show();	
+	$('#editDeviceModal').show();
+
 
 		$.ajax({
                 url: "../api/value.php",
@@ -807,6 +821,12 @@ $("#editRuleConfirmBtn").click(function(){
 	$('#editDeviceLoadingMsg').show();
 	$('#editDeviceLoadingIcon').show();
 
+
+	if ($('#selectKindDeviceM').val() == "property") {
+		$('#inputDataTypeM').empty();
+		$('#inputValueTypeM').empty();
+		$('#valueUnitDeviceM').empty();
+	}
 
     //UPDATE FUNCTION
 	$.ajax({
