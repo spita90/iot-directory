@@ -1683,7 +1683,7 @@ showEditDeviceModal();
 			}			 
 			else if (mydata["status"] === 'ok')
 			{
-				//console.log("Success adding Device");
+				console.log("Success adding Device");
 				//console.log(JSON.stringify(mydata));
 				$('#addDeviceLoadingMsg').hide();
 				$('#addDeviceLoadingIcon').hide();
@@ -2625,7 +2625,7 @@ $("#addNewDeviceCheckExternalBtn").on('click', function(){
 		datatype: 'json',
 		success: function (data)
 		{
-			//nconsole.log("success");
+			//console.log("success");
 			var content = data["content"];
 			for(let i = 0; i < content.length; i++){
 				if(content[i].name == contextbroker){
@@ -2666,7 +2666,7 @@ $("#addNewDeviceCheckExternalBtn").on('click', function(){
 });  // end of ready-state
 function activateStub(cb,deviceName, ipa,protocol,user,accesslink,accessport,model,edge_type,edge_uri,path, apikey,kind, latid, longi)
 {
-	//console.log("log "+ cb + " "+ipa+" "+accesslink+" "+accessport+" "+model+ " api "+ apikey + " organization "+ organization + " kind "+kind);
+	console.log("log "+ cb + " "+ipa+" "+accesslink+" "+accessport+" "+model+ " api "+ apikey + " organization "+ organization + " kind "+kind);
 	var data;
 	if(apikey !== null || apikey !== undefined){
 		data = "contextbroker=" + cb + "&device_name="+ deviceName +"&ip=" + ipa + "&user=" +user+ "&al="+accesslink + "&ap="+accessport+"&model="+model+ "&edge_gateway_type="+edge_type+"&edge_gateway_uri="+edge_uri+"&organization="+organization+"&path="+path+"&kind="+kind+"&apikey="+apikey;
@@ -2676,8 +2676,8 @@ function activateStub(cb,deviceName, ipa,protocol,user,accesslink,accessport,mod
 	}
 	var service = _serviceIP + "/api/"+protocol;
 	
-	//console.log(data);
-	//console.log(service);
+	console.log(data);
+	console.log(service);
 	var xhr = ajaxRequest();
 
 	xhr.addEventListener("readystatechange", function () {

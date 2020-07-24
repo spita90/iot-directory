@@ -151,6 +151,8 @@ router.route('/extract')
 
 		//registeredStub.push(req.body.contextbroker);
 
+	 	console.log(req);
+
 		args= ['./snap4cityBroker/externalBroker.js',
 			req.body.contextbroker,
 			req.body.device_name,
@@ -171,7 +173,6 @@ router.route('/extract')
 	
 		console.log("invoking extract");
 
-		//ANDREA log purpose
 		//console.log(args);
 
 		const child_ngsi = spawn('node',args, {stdio: 'pipe' });
