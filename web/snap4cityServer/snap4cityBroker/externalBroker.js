@@ -14,6 +14,8 @@ var ORGANIZATION=process.argv[11];
 var PATH = process.argv[12];
 var KINDBROKER = process.argv[13];
 var APIKEY = process.argv[14];
+var SERVICE = process.argv[15];
+var SERVICE_PATH = process.argv[16];
 
 //Static values
 var ORION_PROTOCOL = "ngsi";
@@ -86,12 +88,56 @@ cid.connect(function(err){
              }
     console.log('Connection established');
 });
- 
+/*
+//TODO - ANDREA - $ is not defined... come faccio questa chiamata jQuery?
+$.ajax({url: "../api/device.php",
+	data: {
+		organization : ORGANIZATION,
+		action: 'get_param_values'
+	},
+	type: "POST",
+	async: true,
+	dataType: 'json',
+	success: function (mydata)
+	{
+		if (mydata["status"] === 'ok'){
+			gb_datatypes= mydata["data_type"];
+			gb_value_units= mydata["value_unit"];
+			gb_value_types= mydata["value_type"];
+		}
+		else {
+			alert("An error occured when reading the data. <br/> Get in touch with the Snap4City Administrator. <br/>"+ mydata["error_msg"]);
+		}
+	},
+	error: function (mydata)
+	{
+		console.log(JSON.stringify(mydata));
+		alert("Network errors. <br/> Get in touch with the Snap4City Administrator<br/>"+ JSON.stringify(mydata));
+	}
+});
+*/
+
+var req = new XMLHttpRequest();
+var link = "../api/device.php";
+req.open("POST", link, true);
+
+req.onreadystatechange = function() {
+	if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+		let resp= JSON.parse(this.responseText);
+		console.log(resp);
+		gb_datatypes= resp["data_type"];
+		gb_value_units= resp["value_unit"];
+		gb_value_types= resp["value_type"];
+	}
+}
+req.send("organization="+ORGANIZATION+"&action=get_param_values");
+
+
 /*  MAIN PROGRAM */
 
 var httpRequestOutput="";
 
-var link ="";
+link ="";
 var limit = 1000;
 var offset2 = 900;
 var offset = 0;
@@ -123,21 +169,16 @@ retrieveData(xhttp, link);
 
 function retrieveData(xhttp, link){
 	var promiseAcquisition = new Promise(function(resolve2, reject){	
-		xhttp = new XMLHttpRequest();  
+		xhttp = new XMLHttpRequest();
 
-		if(APIKEY !== null && APIKEY !== undefined && APIKEY.localeCompare("null")!==0){
-			//console.log("apikey not null" + ORION_CB + APIKEY);		
-			console.log("link ss"+ link);
-			xhttp.open("GET", link, true);
+		console.log("link ss"+ link);
+
+		xhttp.open("GET", link, true);
+		if(APIKEY !== null && APIKEY !== undefined && APIKEY.localeCompare("null")!==0)
 			xhttp.setRequestHeader("apikey",APIKEY);
-			xhttp.send(); 
-		}//end if APIKEY != NULL
-		else
-		{ //if apikey is not defined
-			console.log("apikey null");
-			xhttp.open("GET", link, true);
-			xhttp.send(); 
-		}
+		xhttp.setRequestHeader("Fiware-Service", SERVICE);
+		xhttp.setRequestHeader("Fiware-ServicePath", SERVICE_PATH);
+		xhttp.send();
 
 		xhttp.onreadystatechange = function() {
 			console.log("readyState " + this.readyState + " status " + this.status + this.responseText );
@@ -190,7 +231,10 @@ function retrieveData(xhttp, link){
 			//	getParam(cid);
 			if(typeof modelsdata === undefined || MODEL.localeCompare("custom")==0|| modelsdata.length <=0 )
 				getModels(cid);
-			
+
+			//ANDREA - FIX - NO MORE NEEDED
+
+			/*
 			var promiseValueType = new Promise(function(resolveValueType,rejectValueType){
 			var valueType  = "SELECT value_type FROM value_types ORDER BY value_type";
 
@@ -210,9 +254,12 @@ function retrieveData(xhttp, link){
 					resolveValueType();	  				
 				}
 			});//end promiseValueType
+
 			promiseValueType.then(function(resolveValueType){
 				
 				var promiseDataType = new Promise(function(resolveDataType, rejectDataType){
+
+			 */
 					var dataType= "SELECT data_type FROM data_types order by data_type";
 						
 						if(gb_datatypes === undefined || gb_datatypes.length <= 0){
@@ -225,12 +272,13 @@ function retrieveData(xhttp, link){
 									gb_datatypes.push(result[i].data_type);
 								}
 						
-								resolveDataType();
+								//resolveDataType();
 							}); //query
 						}
 						else{
-								resolveDataType();
+								//resolveDataType();
 						}
+						/*
 				});//end promise data type
 				promiseDataType.then(function(resolveDataType){
 					var promiseUnit = new Promise(function(resolveUnit, rejectUnit){
@@ -252,7 +300,9 @@ function retrieveData(xhttp, link){
 						}
 					});//end promiseUnit
 					promiseUnit.then(function(resolveDataType){					
-											
+
+
+						 */
 						//checking if the devices already exist in the platform
 						//console.log("registeredDevices " +registeredDevices.length + " orion length "+ orionDevices.length);
 						var newDevices=orionDevices;
@@ -447,12 +497,15 @@ function retrieveData(xhttp, link){
 								console.log("no extraction rules found, returning error msg");
 								console.error("extraction rules not found");
 							});
+						/*
 					});//promise unit then 
 				});//end then promise data type
 
 			});//end then value type 
 			
-				
+
+
+						 */
 			}//end readystate == 4
 			if (this.readyState == 4 && this.status == 500) {
 				//console.log("reject");			

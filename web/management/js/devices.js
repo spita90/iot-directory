@@ -2609,7 +2609,16 @@ $("#addNewDeviceCheckExternalBtn").on('click', function(){
     $("#addDeviceCheckExternalLoadingIcon").show();
 			
     var contextbroker= $('#selectContextBroker').val();
-	var ip, port, protocol,user, accessLink, model, apikey, fiwareservice,kind;
+
+	var deviceService = $('#selectService').val();
+	var deviceServicePath = $('#inputServicePathDevice').val();
+
+	if ($('#selectProtocolDevice').val() === "ngsi w/MultiService"){
+		// servicePath value pre-processing
+		if (deviceServicePath[0] !== "/" || deviceServicePath === "") deviceServicePath = "/" + deviceServicePath;
+		if (deviceServicePath[deviceServicePath.length -1] === "/" && deviceServicePath.length > 1) deviceServicePath = deviceServicePath.substr(0, deviceServicePath.length -1);
+	}
+
 	$.ajax({
 		url: "../api/value.php",
 		data: {
@@ -2650,7 +2659,7 @@ $("#addNewDeviceCheckExternalBtn").on('click', function(){
 					}
 					//console.log("ACTIVATE STUD "+ kind);
 					//console.log("full link "+ accesslink+path);
-					activateStub(contextbroker,device_name,ipa,"extract",user,accesslink,accessport,model,edge_gateway_type,edge_gateway_uri,path,apikey,kind, latid, longi);			
+					activateStub(contextbroker,device_name,ipa,"extract",user,accesslink,accessport,model,edge_gateway_type,edge_gateway_uri,path,apikey,kind, latid, longi, deviceService, deviceServicePath);
 				}
 			}
 			
@@ -2664,9 +2673,9 @@ $("#addNewDeviceCheckExternalBtn").on('click', function(){
 	});
 	   
 });  // end of ready-state
-function activateStub(cb,deviceName, ipa,protocol,user,accesslink,accessport,model,edge_type,edge_uri,path, apikey,kind, latid, longi)
+function activateStub(cb,deviceName,ipa,protocol,user,accesslink,accessport,model,edge_type,edge_uri,path, apikey,kind, latid, longi, deviceService, deviceServicePath)
 {
-	console.log("log "+ cb + " "+ipa+" "+accesslink+" "+accessport+" "+model+ " api "+ apikey + " organization "+ organization + " kind "+kind);
+	//console.log("log "+ cb + " "+ipa+" "+accesslink+" "+accessport+" "+model+ " api "+ apikey + " organization "+ organization + " kind "+kind);
 	var data;
 	if(apikey !== null || apikey !== undefined){
 		data = "contextbroker=" + cb + "&device_name="+ deviceName +"&ip=" + ipa + "&user=" +user+ "&al="+accesslink + "&ap="+accessport+"&model="+model+ "&edge_gateway_type="+edge_type+"&edge_gateway_uri="+edge_uri+"&organization="+organization+"&path="+path+"&kind="+kind+"&apikey="+apikey;
@@ -2674,10 +2683,18 @@ function activateStub(cb,deviceName, ipa,protocol,user,accesslink,accessport,mod
 	else{
 		data = "contextbroker=" + cb + "&device_name="+ deviceName + "&ip=" + ipa + "&user=" +user+ "&al="+accesslink + "&ap="+accessport+"&model="+model+ "&edge_gateway_type="+edge_type+"&edge_gateway_uri="+edge_uri+"&organization="+organization+"&path="+path+"&kind="+kind;		
 	}
+
+	//console.log(deviceService+ " "+deviceServicePath);
+
+	if(deviceService!="" && deviceServicePath!=""){
+		data+="&service="+deviceService+"&service_path="+deviceServicePath;
+	}else{
+		data+="&service=&service_path=";
+	}
 	var service = _serviceIP + "/api/"+protocol;
 	
-	console.log(data);
-	console.log(service);
+	//console.log(data);
+	//console.log(service);
 	var xhr = ajaxRequest();
 
 	xhr.addEventListener("readystatechange", function () {

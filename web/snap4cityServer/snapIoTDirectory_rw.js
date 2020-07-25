@@ -168,12 +168,14 @@ router.route('/extract')
 			req.body.organization,
 			req.body.path,
 			req.body.kind,
-			req.body.apikey
+			req.body.apikey,
+			req.body.service,
+			req.body.service_path
 		];
 	
 		console.log("invoking extract");
 
-		//console.log(args);
+		console.log(args);
 
 		const child_ngsi = spawn('node',args, {stdio: 'pipe' });
 	
