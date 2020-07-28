@@ -50,6 +50,8 @@ app.use('/api', router);
 router.route('/ngsi')
  .post(function(req, res) {
     var args = [];
+
+    //console.log(req);
 	
 	if(registeredStub.get(req.body.contextbroker) != undefined)
 	{
@@ -94,11 +96,13 @@ router.route('/ngsi')
 			req.body.apikey
 		];
 
+		console.log(args);
+
 	 const child_ngsi = spawn('node',args, {
 		//  detached: true,
 		 stdio: 'inherit'
  	});
-	
+
 	registeredStub.set(req.body.contextbroker, child_ngsi);
 
 	var regBroker = "Broker registered: ";
