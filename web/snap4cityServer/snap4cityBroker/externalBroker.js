@@ -89,7 +89,6 @@ cid.connect(function(err){
     console.log('Connection established');
 });
 /*
-//TODO - ANDREA - $ is not defined... come faccio questa chiamata jQuery?
 $.ajax({url: "../api/device.php",
 	data: {
 		organization : ORGANIZATION,
@@ -259,7 +258,6 @@ function retrieveData(xhttp, link){
 				
 				var promiseDataType = new Promise(function(resolveDataType, rejectDataType){
 
-			 */
 					var dataType= "SELECT data_type FROM data_types order by data_type";
 						
 						if(gb_datatypes === undefined || gb_datatypes.length <= 0){
@@ -278,7 +276,6 @@ function retrieveData(xhttp, link){
 						else{
 								//resolveDataType();
 						}
-						/*
 				});//end promise data type
 				promiseDataType.then(function(resolveDataType){
 					var promiseUnit = new Promise(function(resolveUnit, rejectUnit){

@@ -77,7 +77,24 @@ cid.connect(function(err){
              }
      console.log('Connection established');
 });
- 
+
+
+var req = new XMLHttpRequest();
+var link = "../api/device.php";
+req.open("POST", link, true);
+
+req.onreadystatechange = function() {
+	if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+		let resp= JSON.parse(this.responseText);
+		console.log(resp);
+		gb_datatypes= resp["data_type"];
+		gb_value_units= resp["value_unit"];
+		gb_value_types= resp["value_type"];
+	}
+}
+req.send("organization="+ORGANIZATION+"&action=get_param_values");
+
+
 /*  MAIN PROGRAM */
 
 var httpRequestOutput="";
@@ -110,17 +127,28 @@ else{
 
 	}
 }
-	var xhttp = new XMLHttpRequest();  
+	if(ORION_CB=="iotobsf"){
+		link+="/v2/entities";
+	}
 
-function retrieveData(xtp, link, limit, offset){
+	console.log(ORION_CB);
+
+	var xhttp = new XMLHttpRequest();
+
+	retrieveData(xhttp, link, limit, offset);
+
+function retrieveData(xhttp, link, limit, offset){
 	
-	var promiseAcquisition = new Promise(function(resolve2, reject){	
+	var promiseAcquisition = new Promise(function(resolve2, reject){
+
 		xhttp = new XMLHttpRequest();  
 		var linkNoLimit = link.split("?limit");
 		link = linkNoLimit[0];
 
-		link= link+"?limit="+limit+"&offset="+offset;
-		//console.log("Link split "+link);
+		if(limit != undefined && offset != undefined){
+			link= link+"?limit="+limit+"&offset="+offset;
+		}
+		console.log("Link split "+link);
 			
 		if(APIKEY !== null || APIKEY !== undefined){
 
@@ -136,11 +164,13 @@ function retrieveData(xtp, link, limit, offset){
 	
 
 		xhttp.onreadystatechange = function() {
-			//console.log("readyState " + this.readyState + " status " + this.status + this.responseText );
+			console.log("readyState " + this.readyState + " status " + this.status + this.responseText );
 
 			if (this.readyState == 4 && this.status == 200) {
 				//function that manages the output in order to create the data
 			var responseText = this.responseText;
+
+
 			//variable initialization
 			orionDevices= [];
 			orionDevicesType = [];
@@ -176,119 +206,125 @@ function retrieveData(xtp, link, limit, offset){
 			//	getParam(cid);
 			if(typeof modelsdata === undefined || MODEL.localeCompare("custom")==0|| modelsdata.length <=0 )
 				getModels(cid);
-			
-			var promiseValueType = new Promise(function(resolveValueType,rejectValueType){
-			var valueType  = "SELECT value_type FROM value_types ORDER BY value_type";
 
-				if(gb_value_types === undefined || gb_value_types.length <= 0){
-					cid.query(valueType, function (err, result, fields) {
-										
-						if (err) {console.log("sql "+valueType); throw err;}
+				//ANDREA - FIX - NO MORE NEEDED
 
-						for (i = 0; i < result.length; i++) {
-							gb_value_types.push(result[i].value_type);
-						}
-						resolveValueType();	  
-					}); //query
-				}
-				else{
-					resolveValueType();	  				
-				}
-			});//end promiseValueType
-			promiseValueType.then(function(resolveValueType){
-				
-				var promiseDataType = new Promise(function(resolveDataType, rejectDataType){
-					var dataType= "SELECT data_type FROM data_types order by data_type";
-						
-						if(gb_datatypes === undefined || gb_datatypes.length <= 0){
-							cid.query(dataType, function (err, result, fields) {
+				/*
 
-								if (err) {console.log("sql "+dataType); throw err;}
-								
-								for (i = 0; i < result.length; i++) {
-									gb_datatypes.push(result[i].data_type);
-								}
-						
-								resolveDataType();
-							}); //query
-						}
-						else{
-								resolveDataType();
-						}
-				});//end promise data type
-				promiseDataType.then(function(resolveDataType){
-					var promiseUnit = new Promise(function(resolveUnit, rejectUnit){
-						var valueUnit= "SELECT DISTINCT value_unit_default FROM value_types ORDER BY value_unit_default";
-						
-						if(gb_value_units === undefined || gb_value_units.length <= 0){
-							cid.query(valueUnit, function (err, result, fields) {
+                var promiseValueType = new Promise(function(resolveValueType,rejectValueType){
+                var valueType  = "SELECT value_type FROM value_types ORDER BY value_type";
 
-								if (err) {console.log("sql "+valueUnit); throw err;}
-								for (i = 0; i < result.length; i++) {
-								  gb_value_units.push(result[i].value_unit_default);
-								}
-								resolveUnit();
-							}); //query
-						}
-						else{
-							resolveUnit();
-						}
-					});//end promiseUnit
-					promiseUnit.then(function(resolveDataType){					
-					
-					var sql = "(SELECT id FROM temporary_devices WHERE contextBroker = '" + ORION_CB + "') UNION (SELECT id FROM devices WHERE contextBroker = '" + ORION_CB + "')";
+                    if(gb_value_types === undefined || gb_value_types.length <= 0){
+                        cid.query(valueType, function (err, result, fields) {
 
-					cid.query(sql, function (err, result, fields) {
-						if (err) {console.log("sql "+sql); throw err;}
-						for (i = 0; i < result.length; i++) {
-						  registeredDevices.push(result[i].id);
-						}
-						
-						//checking if the devices already exist in the platform
-						//console.log("registeredDevices " +registeredDevices.length + " orion length "+ orionDevices.length);
-						var newDevices=orionDevices.diff(registeredDevices);
-						console.log("There are " +newDevices.length +" new devices for the broker " + ORION_CB);
+                            if (err) {console.log("sql "+valueType); throw err;}
 
-						newDevices = removeDuplicates(newDevices);
-						//Checking duplicates into the same array
-						var extractionRulesAtt = new Object();
-						var extractionRulesDev=new Object();
-						var promiseExtractionRules = new Promise(function (resolveExtraction, rejectExtraction){
-							var query  = "SELECT * FROM extractionRules where contextbroker='"+ORION_CB+"';";
-							//console.log("rules");
-							cid.query(query, function (err, resultRules, fields) {
-													
-							if (err) {console.log("sql "+query); throw err;}
-							//console.log("extraction rules");
-								for(var x = 0; x < resultRules.length; x++){
-									if(resultRules[x]["kind"].localeCompare("property") == 0){
-										extractionRulesDev[resultRules[x]["id"]]=resultRules[x];
-									}
-									else{
-										//console.log("resultRules[x] "+ resultRules[x]["id"]);
-										extractionRulesAtt[resultRules[x]["id"]]=resultRules[x];
-									}
+                            for (i = 0; i < result.length; i++) {
+                                gb_value_types.push(result[i].value_type);
+                            }
+                            resolveValueType();
+                        }); //query
+                    }
+                    else{
+                        resolveValueType();
+                    }
+                });//end promiseValueType
+                promiseValueType.then(function(resolveValueType){
 
-								}
-							if(resultRules.length==0){
-								rejectExtraction();
-							}
-							else{
-								resolveExtraction();	
-							}
-							}); //query
+                    var promiseDataType = new Promise(function(resolveDataType, rejectDataType){
+                        var dataType= "SELECT data_type FROM data_types order by data_type";
 
-						});
-						
-						var se = [];
-						var sesc = [];
-						//console.log("nodup "+ newDevices.length);
-							//			console.log("oriondeviceschema2 "+ JSON.stringify(orionDevicesSchema));
-						var ruleJSON,parser;
-						promiseExtractionRules.then(function(resolveExtraction){
-							/*for (var key in orionDevicesSchema) {
-								console.log(key);			
-							}*/
+                            if(gb_datatypes === undefined || gb_datatypes.length <= 0){
+                                cid.query(dataType, function (err, result, fields) {
+
+                                    if (err) {console.log("sql "+dataType); throw err;}
+
+                                    for (i = 0; i < result.length; i++) {
+                                        gb_datatypes.push(result[i].data_type);
+                                    }
+
+                                    resolveDataType();
+                                }); //query
+                            }
+                            else{
+                                    resolveDataType();
+                            }
+                    });//end promise data type
+                    promiseDataType.then(function(resolveDataType){
+                        var promiseUnit = new Promise(function(resolveUnit, rejectUnit){
+                            var valueUnit= "SELECT DISTINCT value_unit_default FROM value_types ORDER BY value_unit_default";
+
+                            if(gb_value_units === undefined || gb_value_units.length <= 0){
+                                cid.query(valueUnit, function (err, result, fields) {
+
+                                    if (err) {console.log("sql "+valueUnit); throw err;}
+                                    for (i = 0; i < result.length; i++) {
+                                      gb_value_units.push(result[i].value_unit_default);
+                                    }
+                                    resolveUnit();
+                                }); //query
+                            }
+                            else{
+                                resolveUnit();
+                            }
+                        });//end promiseUnit
+                        promiseUnit.then(function(resolveDataType){
+
+				 */
+
+                        var sql = "(SELECT id FROM temporary_devices WHERE contextBroker = '" + ORION_CB + "') UNION (SELECT id FROM devices WHERE contextBroker = '" + ORION_CB + "')";
+
+                        cid.query(sql, function (err, result, fields) {
+                            if (err) {console.log("sql "+sql); throw err;}
+                            for (i = 0; i < result.length; i++) {
+                              registeredDevices.push(result[i].id);
+                            }
+
+                            //checking if the devices already exist in the platform
+                            //console.log("registeredDevices " +registeredDevices.length + " orion length "+ orionDevices.length);
+                            var newDevices=orionDevices.diff(registeredDevices);
+                            console.log("There are " +newDevices.length +" new devices for the broker " + ORION_CB);
+
+                            newDevices = removeDuplicates(newDevices);
+                            //Checking duplicates into the same array
+                            var extractionRulesAtt = new Object();
+                            var extractionRulesDev=new Object();
+                            var promiseExtractionRules = new Promise(function (resolveExtraction, rejectExtraction){
+                                var query  = "SELECT * FROM extractionRules where contextbroker='"+ORION_CB+"';";
+                                //console.log("rules");
+                                cid.query(query, function (err, resultRules, fields) {
+
+                                if (err) {console.log("sql "+query); throw err;}
+                                //console.log("extraction rules");
+                                    for(var x = 0; x < resultRules.length; x++){
+                                        if(resultRules[x]["kind"].localeCompare("property") == 0){
+                                            extractionRulesDev[resultRules[x]["id"]]=resultRules[x];
+                                        }
+                                        else{
+                                            //console.log("resultRules[x] "+ resultRules[x]["id"]);
+                                            extractionRulesAtt[resultRules[x]["id"]]=resultRules[x];
+                                        }
+
+                                    }
+                                if(resultRules.length==0){
+                                    rejectExtraction();
+                                }
+                                else{
+                                    resolveExtraction();
+                                }
+                                }); //query
+
+                            });
+
+                            var se = [];
+                            var sesc = [];
+                            //console.log("nodup "+ newDevices.length);
+                                //			console.log("oriondeviceschema2 "+ JSON.stringify(orionDevicesSchema));
+                            var ruleJSON,parser;
+                            promiseExtractionRules.then(function(resolveExtraction){
+                                /*for (var key in orionDevicesSchema) {
+                                    console.log(key);
+                                }*/
 							//console.log("new devices "+ newDevices +  "registeredDevices "+ registeredDevices );
 
 							var type;
@@ -443,8 +479,8 @@ function retrieveData(xtp, link, limit, offset){
 							/*	for(var key in resApply){
 									console.log("key "+JSON.stringify(resApply[key]));
 								}*/
-						//   console.log("sesc"+ sesc.length + " json "+ JSON.stringify(sesc));
-					  //  process.exit;
+							//   console.log("sesc"+ sesc.length + " json "+ JSON.stringify(sesc));
+					  		//  process.exit;
 								if ( se.length!=0)
 								{
 							
@@ -462,16 +498,20 @@ function retrieveData(xtp, link, limit, offset){
 										//console.log("vales");
 											resolve2();					
 									});
-								
 								}
+
 							});//end then extraction rules
 						}); //query
-					});//promise unit then 
-				});//end then promise data type
 
-			});//end then value type 
-			
-				
+				/*
+        });//promise unit then
+    });//end then promise data type
+
+});//end then value type
+
+
+
+                 */
 			}//end readystate == 4
 			if (this.readyState == 4 && this.status == 500) {
 				//console.log("reject");			
