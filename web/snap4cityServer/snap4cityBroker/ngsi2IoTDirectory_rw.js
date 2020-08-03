@@ -164,9 +164,9 @@ function retrieveData(xhttp, link, limit, offset){
 	
 
 		xhttp.onreadystatechange = function() {
-			console.log("readyState " + this.readyState + " status " + this.status + this.responseText );
 
 			if (this.readyState == 4 && this.status == 200) {
+				console.log("readyState " + this.readyState + " status " + this.status + this.responseText );
 				//function that manages the output in order to create the data
 			var responseText = this.responseText;
 
@@ -471,7 +471,7 @@ function retrieveData(xhttp, link, limit, offset){
 							se.push(storeDevice(USER,topic,MODEL,KIND,devAttr["devicetype"],
 							ORION_PROTOCOL,FREQUENCY, devAttr["format"], ORION_CB,devAttr["latitude"],
 							devAttr["longitude"],devAttr["mac"],validity,verify.message,"no",ORGANIZATION, EDGE_GATEWAY_TYPE,EDGE_GATEWAY_URI,devAttr["k1"],devAttr["k2"]));
-							//console.log("Se "+ JSON.stringify(se));							   
+							//console.log("Se "+ JSON.stringify(se));
 							
 
 							}//end for i 
