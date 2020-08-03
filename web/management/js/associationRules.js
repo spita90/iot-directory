@@ -107,6 +107,9 @@ $.ajax({url: "../api/contextBrokerRetrieval_e.php",
 
 //Sara811 - Start
  $('#retrieveButton').click( function(){
+	 $('#retrieveButton').text("LOADING...PLEASE WAIT");
+	 $('#retrieveButton').prop('disabled', true);
+
     var contextbroker= $('#selectContextBrokerLD').val();
 	var ip, port, protocol,user, accessLink, model, apikey, fiwareservice,kind;
 	$.ajax({
@@ -158,7 +161,7 @@ $.ajax({url: "../api/contextBrokerRetrieval_e.php",
 
 			},
 		error:function(data){
-			console.log("faliure" +  JSON.stringify(data));
+			console.log("failure" +  JSON.stringify(data));
 		}
 		});
 
@@ -166,7 +169,7 @@ $.ajax({url: "../api/contextBrokerRetrieval_e.php",
 
 function activateStub(cb,ipa,protocol,user,accesslink,model,edge_type,edge_uri,path, apikey,kind)
 {
-	//console.log("log "+ cb + " "+ipa+" "+accesslink+" "+model+ " api "+ apikey + " organization "+ organization + " kind "+kind);
+	console.log("log "+ cb + " "+ipa+" "+accesslink+" "+model+ " api "+ apikey + " organization "+ organization + " kind "+kind);
 	var data;
 	if(apikey !== null || apikey !== undefined){
 		data = "contextbroker=" + cb + "&ip=" + ipa	+ "&user=" +user+ "&al="+accesslink + "&model="+model+ "&edge_gateway_type="+edge_type+"&edge_gateway_uri="+edge_uri+"&organization="+organization+"&path="+path+"&kind="+kind+"&apikey="+apikey;
@@ -179,12 +182,13 @@ function activateStub(cb,ipa,protocol,user,accesslink,model,edge_type,edge_uri,p
 	//console.log("data to be sent "+data);
 	//console.log("service "+ service);
 	var xhr = ajaxRequest();
-			location.reload();
+	setTimeout(() => { location.reload(); }, 1000);
+
 
 	xhr.addEventListener("readystatechange", function () {
 		//console.log("this.readyState "+this.readyState);
 	  if (this.readyState === 4 && this.status == 200) {
-		
+
 			return this.responseText;
 		}
 	});
@@ -683,7 +687,7 @@ $(document).ready(function ()
 			$('#activeInactiveBrokes').append(row);
 		}
 		if(document.getElementById("activeInactiveBrokes").options.length==0){
-            var r= $('<option value="No active Broker" name ="inactive">'+"No active Broker"+'</option>');
+            var r= $('<option value="No active Broker discovery" name ="inactive">'+"No active Broker discovery"+'</option>');
             $('#activeInactiveBrokes').append(r);
             $('#inactivateButton').hide();
             $('#stopAllBrokers').hide();
@@ -1689,7 +1693,7 @@ function insertValidDevicesByPieces(start_index,end_index,totalDevices,bulk_offs
 								  {
 									//console.log(myattributes.length + " " +k); 
 									content += drawAttributeMenu(myattributes[k].value_name, 
-										 myattributes[k].data_type, myattributes[k].value_type, myattributes[k].editable, myattributes[k].value_unit, myattributes[k].healthiness_criteria, 
+										 myattributes[k].data_type, myattributes[k].value_type, myattributes[k].editable, myattributes[k].value_unit, myattributes[k].healthiness_criteria,
 										 myattributes[k].healthiness_value, myattributes[k].old_value_name,
 										 'addlistAttributes');
 									k++;
@@ -3586,11 +3590,11 @@ function drawAttributeMenu
         labelcheck="";
         options += "<option value=' ' selected> </option>";
     }
-	for (var n=0; n < gb_value_types.length; n++)
+	for (let n=0; n < gb_value_types.length; n++)
 	{
-	  if (labelcheck == gb_value_types[n]) 
-		 options += "<option value=\""+gb_value_types[n]+"\" selected>"+ gb_value_types[n]+ "</option>";
-	  else options += "<option value=\""+gb_value_types[n]+"\">"+ gb_value_types[n]+ "</option>";
+	  if (labelcheck == gb_value_types[n].value)
+		 options += "<option value=\""+gb_value_types[n].value+"\" selected>"+ gb_value_types[n].label+ "</option>";
+	  else options += "<option value=\""+gb_value_types[n].value+"\">"+ gb_value_types[n].label+ "</option>";
 	}
 
     myunits="";// <option value=\"none\"></option>";
@@ -3600,11 +3604,11 @@ function drawAttributeMenu
 		labelcheck="";
 		myunits += "<option value=' ' selected> </option>";
 	}
-    for (var n=0; n < gb_value_units.length; n++)
+    for (let n=0; n < gb_value_units.length; n++)
 	{
-	  if (labelcheck == gb_value_units[n]) 
-		 myunits += "<option value=\""+gb_value_units[n]+"\" selected>"+ gb_value_units[n]+ "</option>";
-	  else myunits += "<option value=\""+gb_value_units[n]+"\">"+ gb_value_units[n]+ "</option>";
+	  if (labelcheck == gb_value_units[n].value)
+		 myunits += "<option value=\""+gb_value_units[n].value+"\" selected>"+ gb_value_units[n].label+ "</option>";
+	  else myunits += "<option value=\""+gb_value_units[n].value+"\">"+ gb_value_units[n].label+ "</option>";
 	}
 
     //---start sara---
@@ -3650,7 +3654,7 @@ function drawAttributeMenu
         mydatatypes += "<option value=' ' selected> </option>";
     }
     
-    for (var n=0; n < gb_datatypes.length; n++)
+    for (let n=0; n < gb_datatypes.length; n++)
 	{
 	  if (labelcheck == gb_datatypes[n]) 
 		 mydatatypes += "<option value=\""+gb_datatypes[n]+"\" selected>"+ gb_datatypes[n]+ "</option>";

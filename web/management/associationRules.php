@@ -406,7 +406,7 @@ else
                                     <div class="modalFieldCnt">
                                         <select id="selectContextBrokerLD" name="selectContextBrokerLD" class="modalInputTxt">
 										<?php
-                                            $query = "SELECT name FROM contextbroker";
+                                            $query = "SELECT name FROM contextbroker WHERE kind like 'external'";
                                             $result = mysqli_query($link, $query);
 
                                             if($result)
@@ -440,7 +440,7 @@ else
                                     <div class="modalFieldCnt">
                                         <select id="selectModelLD" name="selectModelLD" class="modalInputTxt">
 										<?php
-                                            $query = "SELECT name FROM model";
+                                            $query = "SELECT m.name FROM model m JOIN contextbroker c ON m.contextbroker = c.name WHERE c.kind LIKE 'external'";
                                             $result = mysqli_query($link, $query);
 
                                             if($result)
@@ -526,9 +526,9 @@ else
                                         <button type="text" id="suggestionsButton" name="suggestionsButton" class="btn btn-info">Suggest Modifications</button>
                                      </div>
                                       <div class="uploadBulkLoad pull-right">
-                                        <button type="text" id="activeBrokers" name="activeBrokers" class="btn btn-info">Show active brokers</button>
+                                        <button type="text" id="activeBrokers" name="activeBrokers" class="btn btn-info">Show active broker discovery</button>
 
-                                         <button type="text" id="retrieveButton" name="myDevice"class="btn btn-primary">Retrieves devices</button>
+                                         <button type="text" id="retrieveButton" name="myDevice"class="btn btn-primary">Retrieve devices</button>
                                      </div>
                                  
                             </div>
@@ -572,13 +572,13 @@ else
             </div>
         </div>
         
-        <!-- window to show active brokers -->
+        <!-- window to show active broker discovery -->
 
         <div class="modal fade" id="activeBrokersModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
               <div class="modalHeader centerWithFlex">
-                Active brokers
+                Active broker discovery
                 </div>
                 <div id="displayAllBrokers" class="row mainContentRow">
                     <div class="modal-body">
