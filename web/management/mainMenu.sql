@@ -28,5 +28,6 @@ INSERT INTO `mainmenu` (`id`, `linkUrl`, `linkId`, `icon`, `text`, `privileges`,
 (5, 'users.php', 'userLink', 'fa fa-user', 'List of Users', '["ToolAdmin"]', 'any', 'no', 'samePage', '#FFFFFF', 1, 'IoT Directory: Users'),
 (6, 'account.php', 'accountManagementLink', 'fa fa-lock', 'Account', '["AreaManager","Manager","ToolAdmin"]', 'any', 'no', 'samePage', '#ff9933', 1, 'IoT Directory: Account'),
 (8, 'bulkUpdate.php', 'bulkDUpdateLink', 'fa fa-microchip', 'Update Devices ', '["ToolAdmin"]', 'any', 'no', 'samePage', '#33cc33', 0, 'IoT Directory: Device Bulk Updates'),
+(9, 'bulkCBUpdate.php', 'bulkCBUpdateLink', 'fa fa-microchip', 'Update COntext Broker', '["ToolAdmin"]', 'any', 'no', 'samePage', '#33cc33', 0, 'IoT Directory: Device Bulk Updates'),
 (10, 'setup.php', 'setupLink', 'fa fa-cogs', 'Settings', '["AreaManager","ToolAdmin"]', 'any', 'no', 'samePage', '#00e6e6', 1, 'IoT Directory: Setup'),
-(9, 'bulkCBUpdate.php', 'bulkCBUpdateLink', 'fa fa-microchip', 'Update COntext Broker', '["ToolAdmin"]', 'any', 'no', 'samePage', '#33cc33', 0, 'IoT Directory: Device Bulk Updates');
+(11, 'deviceDiscovery.php', 'deviceDiscoveryLink', 'fa fa-microchip', 'Device Discovery', '["AreaManager","ToolAdmin"]', 'any', 'no', 'samePage', '#cc00cc', 1, 'IoT Directory: Device Discovery');

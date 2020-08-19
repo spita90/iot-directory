@@ -2234,7 +2234,8 @@ showEditDeviceModal();
             $("#addNewDeviceCheckExternalBtn").show();
             $("#addNewDeviceConfirmBtn").hide();
             //$("#selectContextBrokerMsg").hide();
-            
+
+			$('#selectProtocolDevice').prop('disabled', true); // AS fix - if you select the CB we already know what protocol it has, there's no reason to change it
 			$('#inputTypeDevice').val("");
             $("#inputTypeDevice").attr("disabled", true);
 			$('#inputMacDevice').val("");
@@ -2265,17 +2266,15 @@ showEditDeviceModal();
             $("#externalContextBrokerMsg").css("color", "#337ab7");
              $("#externalContextBrokerMsg").html("You've selected a broker from an external environment, you need to check if your device is registered on this broker before adding it." );
              $("#externalContextBrokerMsg").show();
-            
-            
-            
         }
-        else{
-           
-            $("#addNewDeviceCheckExternalBtn").hide();
-            $("#addNewDeviceConfirmBtn").show();
-            $("#externalContextBrokerMsg").hide();
-            
-            $("#inputTypeDevice").attr("disabled", false);
+        else {
+
+			$("#addNewDeviceCheckExternalBtn").hide();
+			$("#addNewDeviceConfirmBtn").show();
+			$("#externalContextBrokerMsg").hide();
+
+			$('#selectProtocolDevice').prop('disabled', true); // AS fix - if you select the CB we already know what protocol it has, there's no reason to change it
+			$("#inputTypeDevice").attr("disabled", false);
 			$("#inputMacDevice").attr("disabled", false);
 			//$("#selectEdgeGatewayType").attr("disabled", false);
 			//$("#inputEdgeGatewayUri").attr("disabled", false);
@@ -2285,13 +2284,13 @@ showEditDeviceModal();
 			$("#KeyTwoDeviceUser").attr("disabled", false);
 			$("#inputLatitudeDevice").attr("disabled", false);
 			$("#inputLongitudeDevice").attr("disabled", false);
-            
-            $("#selectModelDevice").attr("disabled", false);
-            $("#addNewDeviceGenerateKeyBtn").attr("disabled", false);
-            
-            $("#addAttrBtn").attr("disabled", false);
-             //$("#selectContextBrokerMsg").html("");
-            
+
+			$("#selectModelDevice").attr("disabled", false);
+			$("#addNewDeviceGenerateKeyBtn").attr("disabled", false);
+
+			$("#addAttrBtn").attr("disabled", false);
+			//$("#selectContextBrokerMsg").html("");
+		}
             if(valCB ==='ngsi')
             {
                 document.getElementById("selectProtocolDevice").value = 'ngsi';
@@ -2324,9 +2323,6 @@ showEditDeviceModal();
             checkEverything();
             //checkAddMyDeviceConditions(); 
             checkAddDeviceConditions();
-            
-        }
-        
 	
 	});
 	
@@ -2686,11 +2682,8 @@ function activateStub(cb,deviceName,ipa,protocol,user,accesslink,accessport,mode
 
 	//console.log(deviceService+ " "+deviceServicePath);
 
-	if(deviceService!="" && deviceServicePath!=""){
-		data+="&service="+deviceService+"&service_path="+deviceServicePath;
-	}else{
-		data+="&service=&service_path=";
-	}
+	data+="&service="+deviceService+"&service_path="+deviceServicePath;
+
 	var service = _serviceIP + "/api/"+protocol;
 	
 	//console.log(data);

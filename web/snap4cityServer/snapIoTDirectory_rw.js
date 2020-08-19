@@ -215,6 +215,67 @@ router.route('/extract')
                 });
 });
 
+router.route('/discover')
+	.post(function(req, res) {
+		var args = [];
+
+		//registeredStub.push(req.body.contextbroker);
+
+		console.log(req);
+
+		args= ['./snap4cityBroker/discovery.js',
+			req.body.contextbroker,
+			req.body.ip,
+			req.body.port,
+			req.body.al,
+			req.body.ap,
+			req.body.path,
+			req.body.organization,
+			req.body.login,
+			req.body.password,
+			req.body.tenant,
+			req.body.servicepath,
+			req.body.apikey
+		];
+
+		console.log("invoking discovery");
+
+		console.log(args);
+
+		const child_discover = spawn('node',args, {stdio: 'pipe' });
+
+		registeredStub.set(req.body.contextbroker, child_discover);
+
+		//TODO how to uniform these two following Promise and function/then?
+		//correct returning
+		var promiseRes_stdout = new Promise(function(resolve, reject){
+			child_discover.stdout.on('data', function(data) {
+				let result = JSON.parse(data);
+				//console.log("RESULT: "+result);
+				resolve(result);
+			});
+		});
+		promiseRes_stdout.then(function(msg){
+			console.log("returing stdout:"+msg);
+			res.json({ message: msg});
+			child_discover.kill();
+		});
+
+		//error mngt
+		var promiseRes_stderr = new Promise(function(resolve, reject){
+			child_discover.stderr.on('data', (data) => {
+				console.log(`stderr: ${data}`);
+				resolve(data.toString());
+			});
+		});
+		promiseRes_stderr.then(function(msg){
+			console.log("returing stderr:"+msg);
+			res.json({ message: msg});
+			child_discover.kill();
+		});
+	});
+
+
 //Do not put this part in production
 router.route('/rawdata')
  .post(function(req, res) {
