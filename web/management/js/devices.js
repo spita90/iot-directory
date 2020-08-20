@@ -1775,7 +1775,7 @@ showEditDeviceModal();
         
     }
         else{
-            alert("Check the values of your device, make sure that data you entered are valid1");
+            alert("Check the values of your device, make sure that data you entered are valid!");
         }
 });		 	 
 		//add lines related to attributes - addAttrBtnUser		
