@@ -111,14 +111,26 @@ if ($action=="getCBServiceTrees") {
 
             $res=array();
 
-            $q = "SELECT DISTINCT d.contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, d.service, d.servicePath FROM devices d
-                      JOIN contextbroker c on d.contextBroker = c.name WHERE d.protocol LIKE 'ngsi w/MultiService' AND c.kind LIKE 'external' UNION
-                  SELECT DISTINCT dd.contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, dd.service, dd.servicePath FROM deleted_devices dd
-                      JOIN contextbroker c on dd.contextBroker = c.name WHERE dd.protocol LIKE 'ngsi w/MultiService' AND c.kind LIKE 'external' UNION
-                  SELECT DISTINCT m.contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, m.service, m.servicePath FROM model m
-                      JOIN contextbroker c on m.contextBroker = c.name WHERE m.protocol LIKE 'ngsi w/MultiService' AND c.kind LIKE 'external' UNION
-                  SELECT DISTINCT c.name as contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, s.name as service, '' as servicePath  FROM contextbroker c
-                      LEFT JOIN services s ON c.name = s.broker_name WHERE c.protocol LIKE 'ngsi w/MultiService' AND c.kind LIKE 'external'
+            $q = "SELECT DISTINCT d.contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, d.service, d.servicePath
+                  FROM devices d JOIN contextbroker c on d.contextBroker = c.name
+                  WHERE d.protocol LIKE 'ngsi w/MultiService'
+                    AND c.kind LIKE 'external'
+                    AND d.servicePath NOT LIKE '/'
+                  UNION
+                  SELECT DISTINCT dd.contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, dd.service, dd.servicePath
+                  FROM deleted_devices dd JOIN contextbroker c on dd.contextBroker = c.name
+                  WHERE dd.protocol LIKE 'ngsi w/MultiService'
+                    AND c.kind LIKE 'external'
+                  UNION
+                  SELECT DISTINCT m.contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, m.service, m.servicePath
+                  FROM model m JOIN contextbroker c on m.contextBroker = c.name
+                  WHERE m.protocol LIKE 'ngsi w/MultiService'
+                    AND c.kind LIKE 'external'
+                  UNION
+                  SELECT DISTINCT c.name as contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, s.name as service, '/' as servicePath
+                  FROM contextbroker c LEFT JOIN services s ON c.name = s.broker_name
+                  WHERE c.protocol LIKE 'ngsi w/MultiService'
+                    AND c.kind LIKE 'external'
                   ORDER BY contextBroker, service, servicePath";
             $r = mysqli_query($link, $q);
 

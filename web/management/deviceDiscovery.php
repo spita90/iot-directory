@@ -485,13 +485,31 @@ else
 
                     								 <div class="col-xs-12 col-md-6 modalCell">
                                                         <div class="modalFieldCnt">
-                    										<!--
-                    										<select name="selectModelDevice" id="selectModelDevice" class="modalInputTxt">
-                    										    <option data_key="normal" value="custom">custom</option>
-                    										</select>
-                    										-->
+                                                        <select id="selectModelDeviceM" name="selectModelDeviceM" class="modalInputTxt">
+                                                            <?php
+                                                                $query = "SELECT m.name, m.kgenerator FROM model m join contextbroker c on m.contextbroker = c.name
+                                                                          WHERE c.protocol LIKE 'ngsi w/MultiService' AND c.kind LIKE 'external'";
+                                                                $result = mysqli_query($link, $query);
 
-                    										<input id="selectModelDeviceM" name="selectModelDeviceM" class="modalInputTxt" readonly>
+                                                                if($result)
+                                                                {
+                                                                   while($row = $result->fetch_assoc())
+                                                                   {
+                                                                     $name=$row["name"];
+                                                                     $kgen = $row["kgenerator"];
+                                                                     //echo "<option data_key=\"$kgen\" value=\"$name\">$name</option>";
+                                                                     echo "<option data_key=\"$kgen\" value=\"$name\">$name</option>";
+                                                                   }
+
+                                                                }
+                                                                else
+                                                                {
+
+                                                                    $name="ERROR";
+                                                                    echo "<option value=\"$name\">$name</option>";
+                                                                }
+                                                            ?>
+                                                            </select>
                                                         </div>
                                                         <div class="modalFieldLabelCnt">Model</div>
                     									<div id="inputModelDeviceMsg" class="modalFieldMsgCnt">&nbsp;</div>

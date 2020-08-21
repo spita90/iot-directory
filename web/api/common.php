@@ -107,10 +107,13 @@ function insert_device($link, $id, $devicetype, $contextbroker, $kind, $protocol
 	//TODO check if needed
         $syntaxRes=0;
         if ($protocol == 'ngsi w/MultiService'){
-		$id = $service . "." . $servicePath . "." . $id;
- 	        $syntaxRes = servicePathSyntaxCheck($servicePath);
-                $service="'$service'";
-		$servicePath="'$servicePath'";
+            if(strlen($servicePath)>0 && $servicePath{0}!="/"){
+                $servicePath = "/"+$servicePath;
+            }
+            $id = $service . "." . $servicePath . "." . $id;
+                $syntaxRes = servicePathSyntaxCheck($servicePath);
+                    $service="'$service'";
+            $servicePath="'$servicePath'";
         }
         else {
                 $service="NULL";

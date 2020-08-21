@@ -1431,9 +1431,9 @@ showEditDeviceModal();
 								checkAtlistOneAttribute();
 								checkAddDeviceConditions();
 
-								getServicesByCBName($('#selectContextBroker').val(), 'add', data.content.service);
+								//getServicesByCBName($('#selectContextBroker').val(), 'add', data.content.service); // AS Fix - I can have a model for different services
 								checkProtocol($('#selectProtocolDevice').val(), 'add', 'device');
-								$('#inputServicePathDevice').val(data.content.servicePath);
+								//$('#inputServicePathDevice').val(data.content.servicePath);							   // AS Fix - and for differrent path, so no need to change
 								checkServicePath($('#inputServicePathDevice').val(), 'add', 'device');
 								checkAddDeviceConditions();
 							}
@@ -2757,7 +2757,7 @@ function activateStub(cb,deviceName,ipa,protocol,user,accesslink,accessport,mode
             
             $("#selectModelDevice").attr("disabled", false);
             $("#selectModelDevice").val(msg.model);
-            $("#selectProtocolDevice").val(msg.protocol);
+            //$("#selectProtocolDevice").val(msg.protocol);
             $("#selectKindDevice").val(msg.kind);
           
             $("#addNewDeviceGenerateKeyBtn").attr("disabled", false);

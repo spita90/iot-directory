@@ -121,9 +121,13 @@ $('#startDiscoveryButton').click( function() {
 								servicePaths.push(servicePath);
 							}
 						}
+						//console.log(servicePaths);
 						cbs[i].tenants[j].servicePaths = servicePaths;
 					}
 				}
+
+				//console.log("Temporary JSON hierarchy:");
+				//console.log(cbs);
 
 				// Now we have to check for implicit missing paths. What I mean is:
 				// Let's assume that in a certain Tenant we have paths "path1" and "path1/path1_1/path1_1_1"
@@ -134,7 +138,7 @@ $('#startDiscoveryButton').click( function() {
 					for (let j = 0; j < cbs[i].tenants.length; j++) {
 						for (let k = 0; k < cbs[i].tenants[j].servicePaths.length; k++) {
 							let path = cbs[i].tenants[j].servicePaths[k];
-							let slashes = (path.split("/")).length - 1;
+							let slashes = (path.split("/")).length - 2;
 							for (let w = 0; w < slashes; w++) {
 								path = path.substring(0, path.lastIndexOf("/"));
 								if (!cbs[i].tenants[j].servicePaths.includes(path)) {
@@ -159,6 +163,9 @@ $('#startDiscoveryButton').click( function() {
 						}
 					}
 				}
+
+				//console.log(numOfGetRequests);
+
 				for (let i = 0; i < cbs.length; i++) {
 					for (let j = 0; j < cbs[i].tenants.length; j++) {
 						for (let k = 0; k < cbs[i].tenants[j].servicePaths.length; k++) {
@@ -182,7 +189,9 @@ $('#startDiscoveryButton').click( function() {
 
 function activateStub(protocol,cb,ip,port,accesslink,accessport,path,organization,login,password,tenant,servicePath, apikey)
 {
-	if(servicePath != null && servicePath != undefined && servicePath.localeCompare("null")!=0 && servicePath.localeCompare("")!=0){
+	if(servicePath != null && servicePath != undefined &&
+		servicePath.localeCompare("null")!=0 && servicePath.localeCompare("")!=0 &&
+		servicePath.length>1 && servicePath.charAt(0)!="/"){
 		servicePath = "/"+servicePath;
 	}
 
@@ -268,7 +277,7 @@ function getPreExistingExternalDevices(){
 				// In the DB the id of the device is in the form "tenant.path.deviceName
 				// but I am only interested in the name
 				content[i].id = content[i].id.replace(content[i].service,"").replace(content[i].servicePath,"").replace("..","");
-				if(content[i].servicePath.length>0){
+				if(content[i].servicePath.length>0 && content[i].servicePath.charAt(0)!="/"){
 					content[i].servicePath = "/"+content[i].servicePath;
 				}
 			}
@@ -278,6 +287,8 @@ function getPreExistingExternalDevices(){
 			for(let i = 0; i<content.length; i++) {
 				preExistingDevices.push(content[i]);
 			}
+
+			//console.log("Got all devices from the IOT Directory. There are "+preExistingDevices.length+" devices.");
 			//console.log(preExistingDevices);
 
 			// And we can finally begin to build our CB/Tenant/Paths/Devices tree
@@ -483,7 +494,7 @@ function getD3HierarchyFromData(){
 			// so we will have only one path1 with only two children path1_1 and path1_2,
 			// and path1_1 will have only two children path1_1_1 and path1_1_2.
 			for(let k=0;k<pathsToScan.length;k++){
-				let currentPath = pathsToScan[k];
+				let currentPath = pathsToScan[k].substring(1,pathsToScan[k].length);
 				if(currentPath!=""){
 					let pathSplit = currentPath.split("/");
 
@@ -519,11 +530,13 @@ function getD3HierarchyFromData(){
 	}
 	hierarchy.children = brokers;
 
+	//console.log("JSON Hierarchy:");
 	//console.log(hierarchy);
 
 	// Now we just populated the tree with all CBs, tenants, and paths.
 	// At this point we have to put found devices in the tree
 	// and check which ones are already in the IOT Directory
+
 	putDevicesInTree(hierarchy);
 
 	// TODO it would be nice if the tree shows in grey devices that are in the
@@ -533,9 +546,9 @@ function getD3HierarchyFromData(){
 }
 
 function putDevicesInTree(tree){
-	console.log("Devices:")
-	console.log(foundDevices);
-	console.log(preExistingDevices);
+	//console.log("Devices:")
+	//console.log(foundDevices);
+	//console.log(preExistingDevices);
 
 	let ptr;
 	for(let i =0;i<foundDevices.length;i++){
@@ -549,6 +562,7 @@ function putDevicesInTree(tree){
 						if(devicePath.length>0 && devicePath.charAt(0)=="/"){
 							devicePath=devicePath.substring(1,devicePath.length);
 						}
+						//console.log(devicePath);
 						let devicePathSplit = devicePath.split("/");
 						for(let w = 0;w<devicePathSplit.length;w++){
 							for(let x = 0; x<ptr.length;x++){
@@ -851,6 +865,9 @@ $('#editDeviceConfirmBtn').click(function(){
 
 		var service = $('#deviceService').val();
 		var servicePath = $('#editInputServicePathDevice').val();
+		if(servicePath.charAt(0)=="/" && servicePath.length>1){
+			servicePath = servicePath.substring(1,servicePath.length);
+		}
 
 		//console.log($('#selectProtocolDeviceM').val());
 		if ($('#selectProtocolDeviceM').val() == "ngsi w/MultiService"){
