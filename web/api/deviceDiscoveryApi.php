@@ -115,7 +115,6 @@ if ($action=="getCBServiceTrees") {
                   FROM devices d JOIN contextbroker c on d.contextBroker = c.name
                   WHERE d.protocol LIKE 'ngsi w/MultiService'
                     AND c.kind LIKE 'external'
-                    AND d.servicePath NOT LIKE '/'
                   UNION
                   SELECT DISTINCT dd.contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, dd.service, dd.servicePath
                   FROM deleted_devices dd JOIN contextbroker c on dd.contextBroker = c.name
