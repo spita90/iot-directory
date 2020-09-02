@@ -715,27 +715,53 @@ else
 
                                     </div>
 
-                    				<div class="row" id="editDeviceLoadingMsg">
-                                            <div class="col-xs-12 centerWithFlex">Adding device, please wait</div>
-                    				</div>
-                    				<div class="row" id="editDeviceLoadingIcon">
-                                            <div class="col-xs-12 centerWithFlex"><i class="fa fa-circle-o-notch fa-spin" style="font-size:36px;"></i></div>
-                    				</div>
-                    				<div class="row" id="editDeviceOkMsg">
-                                            <div class="col-xs-12 centerWithFlex">Device added successfully</div>
-                    				</div>
-                    				<div class="row" id="editDeviceOkIcon">
-                                            <div class="col-xs-12 centerWithFlex"><i class="fa fa-thumbs-o-up" style="font-size:36px"></i></div>
-                    				</div>
-                    				<div class="row" id="editDeviceKoMsg">
-                    						<div class="col-xs-12 centerWithFlex">Error adding device</div>
-                    						   <div id="editDeviceOkModalInnerDiv1" class="modalDelMsg col-xs-12 centerWithFlex">
-
+                                        <div class="modal fade" id="editDeviceOkModal" tabindex="-1" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                              <div class="modal-content">
+                                                <div class="modalHeader centerWithFlex">
+                                                  Success device registration
                                                 </div>
-                    				</div>
-                    				<div class="row" id="editDeviceKoIcon">
-                                            <div class="col-xs-12 centerWithFlex"><i class="fa fa-thumbs-o-down" style="font-size:36px"></i></div>
-                    				</div>
+                                                <div id="editDeviceModalBody" class="modal-body modalBody">
+                                                    <div class="row">
+                                                        <div class="col-xs-12 modalCell">
+                                                            <div id="editDeviceOkModalInnerDiv1">
+
+                                                            </div>
+                                                            <div class="modalDelObjName col-xs-12 centerWithFlex" id="editDeviceOkModalInnerDiv2"><i class="fa fa-check" style="font-size:36px"></i></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                  <button type="button" id="editDeviceModalCancelBtn" class="btn btn-secondary" data-dismiss="modal">DONE</button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>
+                                        <!-- fail -->
+                                        <div class="modal fade" id="editDeviceKoModal" tabindex="-1" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                              <div class="modal-content">
+                                                <div class="modalHeader centerWithFlex">
+                                                  Add new device
+                                                </div>
+                                                <input type="hidden" id="deviceNameToDelete" />
+                                                <div id="deleteDeviceModalBody" class="modal-body modalBody">
+                                                    <div class="row">
+                                                        <div class="col-xs-12 modalCell">
+                                                            <div id="editDeviceKoModalInnerDiv1" class="modalDelMsg col-xs-12 centerWithFlex">
+
+                                                            </div>
+                                                            <div class="modalDelObjName col-xs-12 centerWithFlex" id="editDeviceKoModalInnerDiv2"><i class="fa fa-frown-o" style="font-size:36px"></i></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                  <button type="button" id="editDeviceKoCancelBtn" class="btn cancelBtn" data-dismiss="modal">Cancel</button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>
+
 
                     				<div id="editDeviceModalFooter" class="modal-footer">
                                       <button type="button" id="editDeviceCancelBtn" class="btn cancelBtn" data-dismiss="modal">Cancel</button>

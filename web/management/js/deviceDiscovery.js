@@ -10,6 +10,7 @@ var editDeviceConditionsArray=[];
 var gb_datatypes ="";
 var gb_value_units ="";
 var gb_value_types = "";
+var indexValues=0;	//it keeps track of unique identirier on the values, so it's possible to enforce specific value type
 
 function ajaxRequest(){
 	var request=false;
@@ -302,7 +303,6 @@ function getPreExistingExternalDevices(){
 }
 
 function buildD3Tree(){
-
 
 	const data = getD3HierarchyFromData();
 
@@ -609,6 +609,7 @@ function openEditDialog(deviceData) {
 	$("#editDeviceModalLabel").html("Adding device - " + deviceData.data.name);
 	$("#editDeviceModal").modal('show');
 
+	$("#selectModelDeviceM").trigger("change");
 	//console.log(deviceData);
 
 	// fill dialog parameters with devices ones
@@ -821,16 +822,16 @@ $('#editDeviceConfirmBtn').click(function(){
 	mynewAttributes = [];
 	var regex=/[^a-z0-9:._-]/gi;
 	var someNameisWrong=false;
-	let num1 = document.getElementById('addlistAttributesM').childElementCount;
+	let num1 = document.getElementById('editlistAttributes').childElementCount;
 	for (var m=0; m< num1; m++)
 	{
-		var newatt= {value_name: document.getElementById('addlistAttributesM').childNodes[m].childNodes[0].childNodes[0].childNodes[0].value.trim(),
-			data_type:document.getElementById('addlistAttributesM').childNodes[m].childNodes[1].childNodes[0].childNodes[0].value.trim(),
-			value_type:document.getElementById('addlistAttributesM').childNodes[m].childNodes[2].childNodes[0].childNodes[0].value.trim(),
-			editable:document.getElementById('addlistAttributesM').childNodes[m].childNodes[3].childNodes[0].childNodes[0].value.trim(),
-			value_unit:document.getElementById('addlistAttributesM').childNodes[m].childNodes[4].childNodes[0].childNodes[0].value.trim(),
-			healthiness_criteria: document.getElementById('addlistAttributesM').childNodes[m].childNodes[5].childNodes[0].childNodes[0].value.trim(),
-			healthiness_value: document.getElementById('addlistAttributesM').childNodes[m].childNodes[6].childNodes[0].childNodes[0].value.trim()};
+		var newatt= {value_name: document.getElementById('editlistAttributes').childNodes[m].childNodes[0].childNodes[0].childNodes[0].value.trim(),
+			data_type:document.getElementById('editlistAttributes').childNodes[m].childNodes[1].childNodes[0].childNodes[0].value.trim(),
+			value_type:document.getElementById('editlistAttributes').childNodes[m].childNodes[2].childNodes[0].childNodes[0].value.trim(),
+			editable:document.getElementById('editlistAttributes').childNodes[m].childNodes[3].childNodes[0].childNodes[0].value.trim(),
+			value_unit:document.getElementById('editlistAttributes').childNodes[m].childNodes[4].childNodes[0].childNodes[0].value.trim(),
+			healthiness_criteria: document.getElementById('editlistAttributes').childNodes[m].childNodes[5].childNodes[0].childNodes[0].value.trim(),
+			healthiness_value: document.getElementById('editlistAttributes').childNodes[m].childNodes[6].childNodes[0].childNodes[0].value.trim()};
 
 		//console.log("new att:"+JSON.stringify(newatt));
 
@@ -843,6 +844,7 @@ $('#editDeviceConfirmBtn').click(function(){
 	if(mynewAttributes.length>0 && !someNameisWrong){
 
 		document.getElementById('editlistAttributes').innerHTML = "";
+		/*
 		$("#editDeviceModalTabs").hide();
 		$("#editDeviceModalBody").hide();
 		$('#editDeviceModal div.modalCell').hide();
@@ -853,6 +855,8 @@ $('#editDeviceConfirmBtn').click(function(){
 		$("#editDeviceKoIcon").hide();
 		$('#editDeviceLoadingMsg').show();
 		$('#editDeviceLoadingIcon').show();
+
+		 */
 
 		//console.log("LISTA" + JSON.stringify(mynewAttributes));
 		var d = new Date();
@@ -924,133 +928,121 @@ $('#editDeviceConfirmBtn').click(function(){
 				//console.log(mydata["msg"]);
 				if(mydata["status"] === 'ko')
 				{
-					console.log("Error adding Device type");
+					alert("Error adding Device");
+					console.log("Error adding Device");
 					console.log(mydata);
-					$('#addDeviceLoadingMsg').hide();
-					$('#addDeviceLoadingIcon').hide();
+					$('#editDeviceLoadingMsg').hide();
+					$('#editDeviceLoadingIcon').hide();
 
-					$("#addDeviceModal").modal('hide');
+					$("#editDeviceModal").modal('hide');
 
-
-					$('#inputNameDevice').val("");
-					$('#inputTypeDevice').val("");
+					$('#inputNameDeviceM').val("");
+					$('#inputTypeDeviceM').val("");
 					//$('#selectKindDevice').val(""),
-					$('#selectContextBroker').val("NULL");
-					$('#inputUriDevice').val("");
+					$('#deviceCB').val("NULL");
+					$('#inputUriDeviceM').val("");
 					//$('#selectProtocolDeviceM').val("NULL");
 					//$('#selectFormatDevice').val("NULL");
-					$('#createdDateDevice').val("");
-					$('#inputMacDevice').val("");
-					$('#selectModelDevice').val("");
-					$('#inputProducerDevice').val("");
-					$('#inputLatitudeDevice').val("");
-					$('#inputLongitudeDevice').val("");
-					$('#inputLongitudeDevice').val("");
-					$('#selectVisibilityDevice').val("NULL");
-					$('#inputFrequencyDevice').val("600");
-					$("#KeyOneDeviceUser").val("");
-					$("#KeyTwoDeviceUser").val("");
-					$("#KeyOneDeviceUserMsg").html("");
-					$("#KeyTwoDeviceUserMsg").html("");
+					$('#inputMacDeviceM').val("");
+					$('#selectModelDeviceM').val("");
+					$('#inputProducerDeviceM').val("");
+					$('#inputLatitudeDeviceM').val("");
+					$('#inputLongitudeDeviceM').val("");
+					$('#selectVisibilityDeviceM').val("NULL");
+					$('#inputFrequencyDeviceM').val("600");
+					$("#KeyOneDeviceUserM").val("");
+					$("#KeyTwoDeviceUserM").val("");
 
-					$('#selectSubnature').val("");
-					$('#selectSubnature').trigger("change");
-					$("#addNewStaticBtn").hide();
+					$('#selectSubnatureM').val("");
+					$('#selectSubnatureM').trigger("change");
+					$("#addNewStaticBtnM").hide();
 
-					$("#addDeviceKoModal").modal('show');
-					$("#addDeviceOkModal").hide();
-					if(mydata["error_msg"]!='undefined' && mydata["error_msg"]!="")
-						$("#addDeviceKoModalInnerDiv1").html('<h5>Operation failed, due to the following Error: ' + mydata["error_msg"]+ '</h5>');
-					else
-						$("#addDeviceKoModalInnerDiv1").html('<h5>An error occurred, operation failed.</h5>');
+					$("#editDeviceKoModal").modal('show');
+					$("#editDeviceOkModal").hide();
 
 				}
 				else if (mydata["status"] === 'ok')
 				{
+					alert("Success adding Device");
 					console.log("Success adding Device");
 					//console.log(JSON.stringify(mydata));
-					$('#addDeviceLoadingMsg').hide();
-					$('#addDeviceLoadingIcon').hide();
 
-					$("#addDeviceModal").modal('hide');
+					console.log(mydata);
+					$('#editDeviceLoadingMsg').hide();
+					$('#editDeviceLoadingIcon').hide();
 
+					$("#editDeviceModal").modal('hide');
 
-					$('#inputNameDevice').val("");
-					$('#inputTypeDevice').val("");
-					$('#selectContextBroker').val("NULL");
-					$('#inputUriDevice').val("");
+					$('#inputNameDeviceM').val("");
+					$('#inputTypeDeviceM').val("");
+					//$('#selectKindDevice').val(""),
+					$('#deviceCB').val("NULL");
+					$('#inputUriDeviceM').val("");
 					//$('#selectProtocolDeviceM').val("NULL");
 					//$('#selectFormatDevice').val("NULL");
-					$('#createdDateDevice').val("");
-					$('#inputMacDevice').val("");
-					$('#selectModelDevice').val("");
-					$('#inputProducerDevice').val("");
-					$('#inputLatitudeDevice').val("");
-					$('#inputLongitudeDevice').val("");
-					$('#inputLongitudeDevice').val("");
-					$('#selectVisibilityDevice').val("NULL");
-					$('#inputFrequencyDevice').val("600");
-					$("#KeyOneDeviceUser").val("");
-					$("#KeyTwoDeviceUser").val("");
-					$("#KeyOneDeviceUserMsg").html("");
-					$("#KeyTwoDeviceUserMsg").html("");
+					$('#inputMacDeviceM').val("");
+					$('#selectModelDeviceM').val("");
+					$('#inputProducerDeviceM').val("");
+					$('#inputLatitudeDeviceM').val("");
+					$('#inputLongitudeDeviceM').val("");
+					$('#selectVisibilityDeviceM').val("NULL");
+					$('#inputFrequencyDeviceM').val("600");
+					$("#KeyOneDeviceUserM").val("");
+					$("#KeyTwoDeviceUserM").val("");
 
-					$('#selectSubnature').val("");
-					$('#selectSubnature').trigger("change");
-					$("#addNewStaticBtn").hide();
+					$('#selectSubnatureM').val("");
+					$('#selectSubnatureM').trigger("change");
+					$("#addNewStaticBtnM").hide();
 
-					$("#addDeviceOkModal").modal('show');
-					$("#addDevicekoModal").hide();
+					$("#editDeviceKoModal").hide();
+					$("#editDeviceOkModalInnerDiv1").html('<h5>The device has been successfully registered. You can find further information on how to use and set up your device at the following page:</h5>' + "   " + '<h5>https://www.snap4city.org/drupal/node/76</h5>');
+					$("#editDeviceOkModal").modal('show');
 
-					$("#addDeviceOkModalInnerDiv1").html('<h5>The device has been successfully registered. You can find further information on how to use and set up your device at the following page:</h5>' + "   " + '<h5>https://www.snap4city.org/drupal/node/76</h5>');
+					$('#statusLabel').text("DEVICE "+id+ " SUCCESFULLY ADDED.");
 
-					$('#devicesTable').DataTable().destroy();
+					setTimeout(() => { $("#editDeviceOkModal").modal('hide');
+											   $('#startDiscoveryButton').click(); }, 2000);
+
+
 				}
 
 			},
 			error: function (mydata)
 			{
+				alert("Error insert device");
 				console.log("Error insert device");
 				console.log("Error status -- Ko result: " + JSON.stringify(mydata));
-				$('#addDeviceLoadingMsg').hide();
-				$('#addDeviceLoadingIcon').hide();
 
-				$("#addDeviceModal").modal('hide');
+				$('#editDeviceLoadingMsg').hide();
+				$('#editDeviceLoadingIcon').hide();
 
+				$("#editDeviceModal").modal('hide');
 
-				$('#inputNameDevice').val("");
-				$('#inputTypeDevice').val("");
-				$('#selectContextBroker').val("NULL");
-				$('#inputUriDevice').val("");
+				$('#inputNameDeviceM').val("");
+				$('#inputTypeDeviceM').val("");
+				//$('#selectKindDevice').val(""),
+				$('#deviceCB').val("NULL");
+				$('#inputUriDeviceM').val("");
 				//$('#selectProtocolDeviceM').val("NULL");
 				//$('#selectFormatDevice').val("NULL");
-				$('#createdDateDevice').val("");
-				$('#inputMacDevice').val("");
-				$('#selectModelDevice').val("");
-				$('#inputProducerDevice').val("");
-				$('#inputLatitudeDevice').val("");
-				$('#inputLongitudeDevice').val("");
-				$('#inputLongitudeDevice').val("");
-				$('#selectVisibilityDevice').val("NULL");
-				$('#inputFrequencyDevice').val("600");
-				$("#KeyOneDeviceUser").val("");
-				$("#KeyTwoDeviceUser").val("");
-				$("#KeyOneDeviceUserMsg").html("");
-				$("#KeyTwoDeviceUserMsg").html("");
+				$('#inputMacDeviceM').val("");
+				$('#selectModelDeviceM').val("");
+				$('#inputProducerDeviceM').val("");
+				$('#inputLatitudeDeviceM').val("");
+				$('#inputLongitudeDeviceM').val("");
+				$('#selectVisibilityDeviceM').val("NULL");
+				$('#inputFrequencyDeviceM').val("600");
+				$("#KeyOneDeviceUserM").val("");
+				$("#KeyTwoDeviceUserM").val("");
 
-
-				$('#selectSubnature').val("");
-				$('#selectSubnature').trigger("change");
-				$("#addNewStaticBtn").hide();
+				$('#selectSubnatureM').val("");
+				$('#selectSubnatureM').trigger("change");
+				$("#addNewStaticBtnM").hide();
 
 				console.log("Error adding Device type");
 				console.log(mydata);
-				$("#addDeviceKoModal").modal('show');
-				$("#addDeviceOkModal").hide();
-				if(mydata["error_msg"]!='undefined' && mydata["error_msg"]!="")
-					$("#addDeviceKoModalInnerDiv1").html('<h5>Operation failed, due to the following Error: ' + mydata["error_msg"]+ '</h5>');
-				else
-					$("#addDeviceKoModalInnerDiv1").html('<h5>An error occurred, operation failed.</h5>');
+				$("#editDeviceKoModal").modal('show');
+				$("#editDeviceOkModal").hide();
 			}
 		});
 
@@ -1074,6 +1066,207 @@ function retrieveStaticAttributes(source, all){
 	}
 	return staticValues;
 }
+
+//Select Model Device
+$("#selectModelDeviceM").change(function() {
+	var nameOpt =  document.getElementById('selectModelDeviceM').options;
+	var selectednameOpt = document.getElementById('selectModelDeviceM').selectedIndex;
+	var ownerSelect =  document.getElementById('selectVisibilityDeviceM').options;
+	var ownerOpt = document.getElementById('selectVisibilityDeviceM').selectedIndex;
+	//Fatima3
+	if ((nameOpt[selectednameOpt].value !="custom")&&(nameOpt[selectednameOpt].value !=""))
+		//if (nameOpt[selectednameOpt].value !="custom")
+	{
+		$("#addNewDeviceGenerateKeyBtn").hide();
+
+		var gb_device =  document.getElementById('inputNameDeviceM').value;
+		var gb_latitude =  document.getElementById('inputLatitudeDeviceM').value;
+		var gb_longitude =  document.getElementById('inputLongitudeDeviceM').value;
+
+		if (nameOpt[selectednameOpt].getAttribute("data_key")!="special") // && ownerSelect[ownerOpt].value=='private')
+		{
+			if ($("#KeyOneDeviceUserM").val()=="")
+			{
+				$("#KeyOneDeviceUserMMsg").html("");
+				$("#KeyTwoDeviceUserMMsg").html("");
+				$("#KeyOneDeviceUserM").val(generateUUID());
+				$("#KeyTwoDeviceUserM").val(generateUUID());
+			}
+		}
+		if (nameOpt[selectednameOpt].getAttribute("data_key")=="special") // && ownerSelect[ownerOpt].value=='private')
+		{
+			$("#KeyOneDeviceUserM").val("");
+			$("#KeyTwoDeviceUserM").val("");
+		}
+		//console.log(nameOpt[selectednameOpt].value + " " + gb_device + " " + gb_longitude + " " + gb_latitude);
+
+		//if(nameOpt[selectednameOpt].value !="custom" && nameOpt[selectednameOpt].value!="")
+		//{
+		$.ajax({
+			url: "../api/model.php",
+			data: {
+				action: "get_model",
+				organization : organization,
+				name: nameOpt[selectednameOpt].value
+			},
+			type: "POST",
+			async: true,
+			datatype: 'json',
+			success: function (data)
+			{
+				if(data["status"] === 'ko')
+				{
+					// data = data["content"];
+					alert("An error occured when reading the data. <br/> Get in touch with the Snap4City Administrator<br/>"+ data["msg"]);
+				}
+
+				else (data["status"] === 'ok')
+				{
+					//		console.log(data.content.attributes);
+					var model = data.content.name;
+					var type = data.content.devicetype;
+					var kind = data.content.kind;
+					var producer = data.content.producer;
+					//var mac = data.content.mac;
+					var frequency = data.content.frequency;
+					var contextbroker = data.content.contextbroker;
+					//var protocol = data.content.protocol;
+					var format = data.content.format;
+					var myattributes  = JSON.parse(data.content.attributes);
+					var k =0;
+					var content ="";
+					// population of the value tab with the values taken from the db
+					while (k < myattributes.length)
+					{
+						//console.log(myattributes.length + " " +k);
+						content += drawAttributeMenu(myattributes[k].value_name,
+							myattributes[k].data_type, myattributes[k].value_type, myattributes[k].editable, myattributes[k].value_unit, myattributes[k].healthiness_criteria,
+							myattributes[k].healthiness_value, myattributes[k].old_value_name, 'addlistAttributes', indexValues);
+						indexValues=indexValues+1;
+						k++;
+					}
+					$('#editlistAttributes').html(content);
+
+					$('#inputTypeDeviceM').val(data.content.devicetype);
+					$('#selectKindDeviceM').val(data.content.kind);
+					$('#inputProducerDeviceM').val(data.content.producer);
+					$('#inputFrequencyDeviceM').val(data.content.frequency);
+					//$('#inputMacDevice').val(data.content.mac);
+					$('#deviceCB').val(data.content.contextbroker);
+					$('#selectProtocolDeviceM').val(data.content.protocol);
+					$('#selectFormatDeviceM').val(data.content.format);
+					$('#selectEdgeGatewayTypeM').val(data.content.edgegateway_type);
+
+					$('#selectSubnatureM').val(data.content.subnature);
+					$('#selectSubnatureM').trigger('change');
+					//subnatureChanged(false, JSON.parse(data.content.static_attributes));
+
+					addDeviceConditionsArray['contextbroker'] = true;
+					addDeviceConditionsArray['kind'] = true;
+					addDeviceConditionsArray['format'] = true;
+					addDeviceConditionsArray['protocol'] = true;
+
+
+
+					addDeviceConditionsArray['inputTypeDevice'] = true;
+					checkDeviceType(); // checkAddDeviceConditions();
+					addDeviceConditionsArray['inputFrequencyDevice'] = true;
+					checkFrequencyType(); // checkAddDeviceConditions();
+					addDeviceConditionsArray['inputMacDevice'] = true;
+					checkMAC();
+
+					//getServicesByCBName($('#selectContextBroker').val(), 'add', data.content.service); // AS Fix - I can have a model for different services
+					//checkProtocol($('#selectProtocolDevice').val(), 'add', 'device');
+					//$('#inputServicePathDevice').val(data.content.servicePath);							   // AS Fix - and for differrent path, so no need to change
+					//checkServicePath($('#inputServicePathDevice').val(), 'add', 'device');
+				}
+			},
+			error: function (data)
+			{
+				console.log("Ko result: " + JSON.stringify(data));
+				$('#addlistAttributes').html("");
+
+				$('#inputTypeDeviceM').val("");
+				//$('#selectKindDevice').val("");
+				$('#inputProducerDeviceM').val("");
+				$('#inputFrequencyDeviceM').val("600");
+				$('#inputMacDeviceM').val("");
+				$('#deviceCB').val("");
+				//$('#selectProtocolDevice').val("");
+				//$('#selectFormatDevice').val("");
+				alert("An error occured when reading the information about model. <br/> Try again or get in touch with the Snap4City Administrator<br/>");
+
+			}
+
+		});
+
+		if (nameOpt[selectednameOpt].getAttribute("data_key")!="special")
+		{
+			$("#KeyOneDeviceUserM").attr({'disabled': 'disabled'});
+			$("#KeyTwoDeviceUserM").attr({'disabled': 'disabled'});
+		}
+		else{
+			$("#KeyOneDeviceUserM").removeAttr('disabled');
+			$("#KeyTwoDeviceUserM").removeAttr('disabled');
+		}
+	}
+	else if (nameOpt[selectednameOpt].value ==""){ // case not specified
+		$('#inputTypeDeviceM').val("");
+		//$('#selectKindDevice').val("");
+		$('#inputProducerDeviceM').val("");
+		$('#inputFrequencyDeviceM').val("600");
+
+		$('#inputMacDeviceM').val("");
+		$('#deviceCB').val("");
+		//$('#selectProtocolDevice').val("");
+		//$('#selectFormatDevice').val("");
+		$("#KeyOneDeviceUserM").val("");
+		$("#KeyTwoDeviceUserM").val("");
+		$('#KeyOneDeviceUserMMsg').html("");
+		$('#KeyTwoDeviceUserMMsg').html("");
+		$('#KeyOneDeviceUserMMsg').val("");
+		$('#KeyTwoDeviceUserMMsg').val("");
+		// $('#addlistAttributes').html("");
+
+		addDeviceConditionsArray['contextbroker'] = false;
+		addDeviceConditionsArray['kind'] = false;
+		addDeviceConditionsArray['format'] = false;
+		addDeviceConditionsArray['protocol'] = false;
+
+
+		addDeviceConditionsArray['inputTypeDevice'] = false;
+		checkDeviceType();
+		addDeviceConditionsArray['inputFrequencyDevice'] = false;
+		checkFrequencyType();
+		addDeviceConditionsArray['inputMacDevice'] = false;
+		checkMAC();
+
+		document.getElementById('addlistAttributes').innerHTML = "";
+
+	} else // case custom
+	{
+
+		if ($('#inputTypeDeviceM').val()=="")
+			addDeviceConditionsArray['inputTypeDevice'] = false;
+		else
+			addDeviceConditionsArray['inputTypeDevice'] = true;
+		checkDeviceType();
+		if ($('#inputFrequencyDeviceM').val()=="")
+			addDeviceConditionsArray['inputFrequencyDevice'] = false;
+		else
+			addDeviceConditionsArray['inputFrequencyDevice'] = true;
+		checkFrequencyType();
+		if ($('#inputMacDeviceM').val()=="")
+			addDeviceConditionsArray['inputMacDevice'] = false;
+		else
+			addDeviceConditionsArray['inputMacDevice'] = true;
+		checkMAC();
+
+		$("#KeyOneDeviceUserM").removeAttr('disabled');
+		$("#KeyTwoDeviceUserM").removeAttr('disabled');
+	}
+
+});
 
 
 $(document).ready(function () {
