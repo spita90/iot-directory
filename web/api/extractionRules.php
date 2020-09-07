@@ -230,7 +230,7 @@ else if ($action=="get_rules"){
 				$rec["value_unit"]=$row["value_unit"];
 				$rec["structure_flag"]=$row["structure_flag"];
 				
-				array_push($rules, $rec);           
+				array_push($rules, $rec);
 			}
 		}
 	 $output= format_result($_REQUEST["draw"], $selectedrows+1, $selectedrows+1, $rules, "", "\r\n action=get_rules \r\n", 'ok');	
