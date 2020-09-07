@@ -609,11 +609,13 @@ function openEditDialog(deviceData) {
 	$("#editDeviceModalLabel").html("Adding device - " + deviceData.data.name);
 	$("#editDeviceModal").modal('show');
 
-	$("#selectModelDeviceM").trigger("change");
+	$("#inputModelDeviceM").val("custom");
+	$("#inputModelDeviceM").prop("disabled", true);
 	//console.log(deviceData);
 
 	// fill dialog parameters with devices ones
 	var id = deviceData.id;
+	var contextBroker = deviceData.data.contextBroker;
 
 	if (currentEditId!==id) {
 		//if the user changed the device to edit, clean the list of value and update the currentEditId
@@ -621,11 +623,11 @@ function openEditDialog(deviceData) {
 		document.getElementById('addlistAttributesM').innerHTML = "";
 		document.getElementById('deletedAttributes').innerHTML = "";
 		currentEditId = id;
+		editGenerateKeysCLicked();
 
 		deviceData=deviceData.data;
 
 		let deviceName = deviceData.name;
-		let contextbroker = deviceData.contextBroker;
 		let type = deviceData.type;
 		let latitude = deviceData.latitude;
 		let longitude = deviceData.longitude;
@@ -633,7 +635,7 @@ function openEditDialog(deviceData) {
 		let servicePath = deviceData.servicePath;
 
 		$('#inputNameDeviceM').prop("disabled", true);	$('#inputNameDeviceM').val(deviceName);
-		$('#deviceCB').prop("disabled", true);	$('#deviceCB').val(contextbroker);
+		$('#deviceCB').prop("disabled", true);	$('#deviceCB').val(contextBroker);
 		$('#inputTypeDeviceM').val(type);
 		$('#selectProtocolDeviceM').val("ngsi w/MultiService");
 		$('#selectFormatDeviceM').val("json");
@@ -642,6 +644,70 @@ function openEditDialog(deviceData) {
 		$('#deviceService').prop("disabled", true);	$('#deviceService').val(service);
 		$('#editInputServicePathDevice').prop("disabled", true);	$('#editInputServicePathDevice').val(servicePath);
 	}
+
+		//reperisci i values tramite le extraction rules prese tramite api
+
+	$.ajax({url: "../api/extractionRules.php",
+		data: {
+			action: 'get_rules',
+			organization:organization,
+			username:loggedUser,
+			loggedrole: loggedRole,
+			length: -1
+		},
+		type: "POST",
+		async: true,
+		dataType: 'json',
+		success: function (mydata)
+		{
+			if(mydata["status"] === 'ko'){
+				console.log(JSON.stringify(mydata));
+				alert("Network errors while getting device extraction rules. Get in touch with the Snap4City Administrator."+ JSON.stringify(mydata));
+			}else if(mydata["status"] === 'ok') {
+				//seleziona solo le rules inerenti al context broker interessato
+				//console.log(mydata);
+				var rules = mydata["data"];
+				if(rules.length>0) {
+					//console.log("device cb: "+contextBroker);
+					for(let i =0;i<rules.length;i++){
+						if(rules[i].contextbroker!=contextBroker){
+							rules.splice(i,1);
+							--i;
+						}
+					}
+					if(rules.length>0){
+						//now we have all extraction rules belonging to current context broker.
+						//so let's apply them all in the "Values" tab
+						var content ="";
+						for(let i=0; i<rules.length;i++){
+							//console.log(rules[i]);
+							let attributeName = rules[i].selector;
+							attributeName = (attributeName.match(/\"\$\..*?\"/))[0];
+							attributeName = attributeName.substring(0,attributeName.length-1).substring(3,attributeName.length);
+							//console.log(attributeName);
+							content+= drawAttributeMenu(attributeName, rules[i].data_type, rules[i].value_type, true,
+								rules[i].value_unit, "refresh_rate", 300, attributeName,
+								"editlistAttributes");
+						}
+						$('#editlistAttributes').html(content);
+					}else{
+						console.log("no extraction rules found for context broker '"+contextBroker+"'");
+						alert("No extraction rules found for context broker '"+contextBroker+"'. Please add proper extraction rules or set device values manually.");
+					}
+				}else{
+					console.log("no extraction rules found");
+					alert("No extraction rules found. Please add proper extraction rules or set device values manually.");
+				}
+			}
+		},
+		error: function (mydata)
+		{
+			console.log(JSON.stringify(mydata));
+			alert("Network errors while getting device extraction rules. Get in touch with the Snap4City Administrator"+ JSON.stringify(mydata));
+		}
+	});
+
+
 	$('#editDeviceModal').show();
 }
 
@@ -899,7 +965,7 @@ $('#editDeviceConfirmBtn').click(function(){
 				protocol: $('#selectProtocolDeviceM').val(),
 				format: $('#selectFormatDeviceM').val(),
 				mac: $('#inputMacDeviceM').val(),
-				model: $('#selectModelDeviceM').val(),
+				model: $('#inputModelDeviceM').val(),
 				producer: $('#inputProducerDeviceM').val(),
 				latitude: $('#inputLatitudeDeviceM').val(),
 				longitude: $('#inputLongitudeDeviceM').val(),
@@ -944,7 +1010,7 @@ $('#editDeviceConfirmBtn').click(function(){
 					//$('#selectProtocolDeviceM').val("NULL");
 					//$('#selectFormatDevice').val("NULL");
 					$('#inputMacDeviceM').val("");
-					$('#selectModelDeviceM').val("");
+					$('#inputModelDeviceM').val("");
 					$('#inputProducerDeviceM').val("");
 					$('#inputLatitudeDeviceM').val("");
 					$('#inputLongitudeDeviceM').val("");
@@ -981,7 +1047,7 @@ $('#editDeviceConfirmBtn').click(function(){
 					//$('#selectProtocolDeviceM').val("NULL");
 					//$('#selectFormatDevice').val("NULL");
 					$('#inputMacDeviceM').val("");
-					$('#selectModelDeviceM').val("");
+					$('#inputModelDeviceM').val("");
 					$('#inputProducerDeviceM').val("");
 					$('#inputLatitudeDeviceM').val("");
 					$('#inputLongitudeDeviceM').val("");
@@ -1026,7 +1092,7 @@ $('#editDeviceConfirmBtn').click(function(){
 				//$('#selectProtocolDeviceM').val("NULL");
 				//$('#selectFormatDevice').val("NULL");
 				$('#inputMacDeviceM').val("");
-				$('#selectModelDeviceM').val("");
+				$('#inputModelDeviceM').val("");
 				$('#inputProducerDeviceM').val("");
 				$('#inputLatitudeDeviceM').val("");
 				$('#inputLongitudeDeviceM').val("");
@@ -1066,208 +1132,6 @@ function retrieveStaticAttributes(source, all){
 	}
 	return staticValues;
 }
-
-//Select Model Device
-$("#selectModelDeviceM").change(function() {
-	var nameOpt =  document.getElementById('selectModelDeviceM').options;
-	var selectednameOpt = document.getElementById('selectModelDeviceM').selectedIndex;
-	var ownerSelect =  document.getElementById('selectVisibilityDeviceM').options;
-	var ownerOpt = document.getElementById('selectVisibilityDeviceM').selectedIndex;
-	//Fatima3
-	if ((nameOpt[selectednameOpt].value !="custom")&&(nameOpt[selectednameOpt].value !=""))
-		//if (nameOpt[selectednameOpt].value !="custom")
-	{
-		$("#addNewDeviceGenerateKeyBtn").hide();
-
-		var gb_device =  document.getElementById('inputNameDeviceM').value;
-		var gb_latitude =  document.getElementById('inputLatitudeDeviceM').value;
-		var gb_longitude =  document.getElementById('inputLongitudeDeviceM').value;
-
-		if (nameOpt[selectednameOpt].getAttribute("data_key")!="special") // && ownerSelect[ownerOpt].value=='private')
-		{
-			if ($("#KeyOneDeviceUserM").val()=="")
-			{
-				$("#KeyOneDeviceUserMMsg").html("");
-				$("#KeyTwoDeviceUserMMsg").html("");
-				$("#KeyOneDeviceUserM").val(generateUUID());
-				$("#KeyTwoDeviceUserM").val(generateUUID());
-			}
-		}
-		if (nameOpt[selectednameOpt].getAttribute("data_key")=="special") // && ownerSelect[ownerOpt].value=='private')
-		{
-			$("#KeyOneDeviceUserM").val("");
-			$("#KeyTwoDeviceUserM").val("");
-		}
-		//console.log(nameOpt[selectednameOpt].value + " " + gb_device + " " + gb_longitude + " " + gb_latitude);
-
-		//if(nameOpt[selectednameOpt].value !="custom" && nameOpt[selectednameOpt].value!="")
-		//{
-		$.ajax({
-			url: "../api/model.php",
-			data: {
-				action: "get_model",
-				organization : organization,
-				name: nameOpt[selectednameOpt].value
-			},
-			type: "POST",
-			async: true,
-			datatype: 'json',
-			success: function (data)
-			{
-				if(data["status"] === 'ko')
-				{
-					// data = data["content"];
-					alert("An error occured when reading the data. <br/> Get in touch with the Snap4City Administrator<br/>"+ data["msg"]);
-				}
-
-				else (data["status"] === 'ok')
-				{
-					//		console.log(data.content.attributes);
-					var model = data.content.name;
-					var type = data.content.devicetype;
-					var kind = data.content.kind;
-					var producer = data.content.producer;
-					//var mac = data.content.mac;
-					var frequency = data.content.frequency;
-					var contextbroker = data.content.contextbroker;
-					//var protocol = data.content.protocol;
-					var format = data.content.format;
-					var myattributes  = JSON.parse(data.content.attributes);
-					var k =0;
-					var content ="";
-					// population of the value tab with the values taken from the db
-					while (k < myattributes.length)
-					{
-						//console.log(myattributes.length + " " +k);
-						content += drawAttributeMenu(myattributes[k].value_name,
-							myattributes[k].data_type, myattributes[k].value_type, myattributes[k].editable, myattributes[k].value_unit, myattributes[k].healthiness_criteria,
-							myattributes[k].healthiness_value, myattributes[k].old_value_name, 'addlistAttributes', indexValues);
-						indexValues=indexValues+1;
-						k++;
-					}
-					$('#editlistAttributes').html(content);
-
-					$('#inputTypeDeviceM').val(data.content.devicetype);
-					$('#selectKindDeviceM').val(data.content.kind);
-					$('#inputProducerDeviceM').val(data.content.producer);
-					$('#inputFrequencyDeviceM').val(data.content.frequency);
-					//$('#inputMacDevice').val(data.content.mac);
-					$('#deviceCB').val(data.content.contextbroker);
-					$('#selectProtocolDeviceM').val(data.content.protocol);
-					$('#selectFormatDeviceM').val(data.content.format);
-					$('#selectEdgeGatewayTypeM').val(data.content.edgegateway_type);
-
-					$('#selectSubnatureM').val(data.content.subnature);
-					$('#selectSubnatureM').trigger('change');
-					//subnatureChanged(false, JSON.parse(data.content.static_attributes));
-
-					addDeviceConditionsArray['contextbroker'] = true;
-					addDeviceConditionsArray['kind'] = true;
-					addDeviceConditionsArray['format'] = true;
-					addDeviceConditionsArray['protocol'] = true;
-
-
-
-					addDeviceConditionsArray['inputTypeDevice'] = true;
-					checkDeviceType(); // checkAddDeviceConditions();
-					addDeviceConditionsArray['inputFrequencyDevice'] = true;
-					checkFrequencyType(); // checkAddDeviceConditions();
-					addDeviceConditionsArray['inputMacDevice'] = true;
-					checkMAC();
-
-					//getServicesByCBName($('#selectContextBroker').val(), 'add', data.content.service); // AS Fix - I can have a model for different services
-					//checkProtocol($('#selectProtocolDevice').val(), 'add', 'device');
-					//$('#inputServicePathDevice').val(data.content.servicePath);							   // AS Fix - and for differrent path, so no need to change
-					//checkServicePath($('#inputServicePathDevice').val(), 'add', 'device');
-				}
-			},
-			error: function (data)
-			{
-				console.log("Ko result: " + JSON.stringify(data));
-				$('#addlistAttributes').html("");
-
-				$('#inputTypeDeviceM').val("");
-				//$('#selectKindDevice').val("");
-				$('#inputProducerDeviceM').val("");
-				$('#inputFrequencyDeviceM').val("600");
-				$('#inputMacDeviceM').val("");
-				$('#deviceCB').val("");
-				//$('#selectProtocolDevice').val("");
-				//$('#selectFormatDevice').val("");
-				alert("An error occured when reading the information about model. <br/> Try again or get in touch with the Snap4City Administrator<br/>");
-
-			}
-
-		});
-
-		if (nameOpt[selectednameOpt].getAttribute("data_key")!="special")
-		{
-			$("#KeyOneDeviceUserM").attr({'disabled': 'disabled'});
-			$("#KeyTwoDeviceUserM").attr({'disabled': 'disabled'});
-		}
-		else{
-			$("#KeyOneDeviceUserM").removeAttr('disabled');
-			$("#KeyTwoDeviceUserM").removeAttr('disabled');
-		}
-	}
-	else if (nameOpt[selectednameOpt].value ==""){ // case not specified
-		$('#inputTypeDeviceM').val("");
-		//$('#selectKindDevice').val("");
-		$('#inputProducerDeviceM').val("");
-		$('#inputFrequencyDeviceM').val("600");
-
-		$('#inputMacDeviceM').val("");
-		$('#deviceCB').val("");
-		//$('#selectProtocolDevice').val("");
-		//$('#selectFormatDevice').val("");
-		$("#KeyOneDeviceUserM").val("");
-		$("#KeyTwoDeviceUserM").val("");
-		$('#KeyOneDeviceUserMMsg').html("");
-		$('#KeyTwoDeviceUserMMsg').html("");
-		$('#KeyOneDeviceUserMMsg').val("");
-		$('#KeyTwoDeviceUserMMsg').val("");
-		// $('#addlistAttributes').html("");
-
-		addDeviceConditionsArray['contextbroker'] = false;
-		addDeviceConditionsArray['kind'] = false;
-		addDeviceConditionsArray['format'] = false;
-		addDeviceConditionsArray['protocol'] = false;
-
-
-		addDeviceConditionsArray['inputTypeDevice'] = false;
-		checkDeviceType();
-		addDeviceConditionsArray['inputFrequencyDevice'] = false;
-		checkFrequencyType();
-		addDeviceConditionsArray['inputMacDevice'] = false;
-		checkMAC();
-
-		document.getElementById('addlistAttributes').innerHTML = "";
-
-	} else // case custom
-	{
-
-		if ($('#inputTypeDeviceM').val()=="")
-			addDeviceConditionsArray['inputTypeDevice'] = false;
-		else
-			addDeviceConditionsArray['inputTypeDevice'] = true;
-		checkDeviceType();
-		if ($('#inputFrequencyDeviceM').val()=="")
-			addDeviceConditionsArray['inputFrequencyDevice'] = false;
-		else
-			addDeviceConditionsArray['inputFrequencyDevice'] = true;
-		checkFrequencyType();
-		if ($('#inputMacDeviceM').val()=="")
-			addDeviceConditionsArray['inputMacDevice'] = false;
-		else
-			addDeviceConditionsArray['inputMacDevice'] = true;
-		checkMAC();
-
-		$("#KeyOneDeviceUserM").removeAttr('disabled');
-		$("#KeyTwoDeviceUserM").removeAttr('disabled');
-	}
-
-});
-
 
 $(document).ready(function () {
 	$('#startDiscoveryButton').prop('disabled', false);
