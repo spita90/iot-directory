@@ -339,14 +339,14 @@ else
                             <div id="hintIta" class="row">
                                 In questa pagina puoi lanciare una scansione su tutti i Context Broker esterni di tipo "ngsi w/ Multiservice" al fine di trovare nuovi
                                 Devices ed aggiungerli alla IOT Directory. Nota: nei Context Broker dotati di "Multi-tenancy" e/o "Service Path" la scansione avverrà,
-                                oltre che alla root, soltanto nei Service/Tenant conosciuti (per come registrati nelle info del Context broker, nella IOT Directory) e
-                                nei Service Path conosciuti (ossia in cui si ha almeno un device aggiunto alla IOT Directory o quelli indicati nei Device Model).
+                                oltre che nel Tenant di default, soltanto nei Service/Tenant conosciuti (per come registrati nelle info del Context broker, nella IOT Directory) e
+                                solo nei Service Path conosciuti (nella root e nei path in cui si ha almeno un device aggiunto alla IOT Directory o quelli indicati nei Device Model).
                             </div>
                             <div id="hintEng" class="row">
                                 In this page you can launch a scan on every external Context Broker of the "ngsi w/ Multiservice" kind, in order to find new
                                 Devices and add them to the IOT Directory. Note: In the "Multi-tenancy" and/or "Service Path" capable Context Brokers the scan
-                                will take place in the root directory and only in known Service/Tenants (those already registered in the Context Broker info,
-                                in the IOT Directory) and only in known Service Paths (those in which you already have a device added in the IOT Directory or
+                                will take place in the default Tenant and then only in known Service/Tenants (those already registered in the Context Broker info,
+                                in the IOT Directory) and only in known Service Paths (in the root directory and those in which you already have a device added in the IOT Directory or
                                 those registered in the Device Models).
                             </div>
 
