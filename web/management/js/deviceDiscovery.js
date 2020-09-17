@@ -482,7 +482,7 @@ function getD3HierarchyFromData(){
 		let cb = new Object({name: cbs[i].name});
 		let tenants = [];
 		for(let j=0;j<cbs[i].tenants.length;j++){
-			let tenant = new Object({name: cbs[i].tenants[j].name!=""?cbs[i].tenants[j].name:"ORION ROOT"});
+			let tenant = new Object({name: cbs[i].tenants[j].name!=""?cbs[i].tenants[j].name:"DEFAULT TENANT"});
 			let paths = [];
 
 			let pathsToScan = cbs[i].tenants[j].servicePaths;
@@ -555,7 +555,7 @@ function putDevicesInTree(tree){
 		for(let j=0;j<tree.children.length;j++){
 			if(tree.children[j].name==foundDevices[i].contextBroker){
 				for(let k=0;k<tree.children[j].children.length;k++){
-					if(tree.children[j].children[k].name==foundDevices[i].service || (tree.children[j].children[k].name=="ORION ROOT" && foundDevices[i].service=="")){
+					if(tree.children[j].children[k].name==foundDevices[i].service || (tree.children[j].children[k].name=="DEFAULT TENANT" && foundDevices[i].service=="")){
 						ptr=tree.children[j].children[k].children;
 						//entered in tenant
 						let devicePath = foundDevices[i].servicePath;
