@@ -5,6 +5,7 @@ var foundDevices = [];
 var preExistingDevices = [];
 var numOfGetRequests = 0;
 var numOfReturnedGetRequests = 0;
+var cbsWithErrors = [];
 var currentEditId="";
 var editDeviceConditionsArray=[];
 var gb_datatypes ="";
@@ -214,12 +215,24 @@ function activateStub(protocol,cb,ip,port,accesslink,accessport,path,organizatio
 			let jsonResponse = JSON.parse(this.responseText).message;
 			//console.log(jsonResponse);
 			if(jsonResponse=="not reacheable\n"){
+				numOfGetRequests--;
+				if(!cbsWithErrors.includes(cb)){
+					cbsWithErrors.push(cb);
+				}
 				console.error("Context Broker "+cb+ " is not reachable.");
 				$('#statusLabel').text("Context Broker "+cb+ " is not reachable.");
 			}else if(jsonResponse=="path malformed\n"){
+				numOfGetRequests--;
+				if(!cbsWithErrors.includes(cb)){
+					cbsWithErrors.push(cb);
+				}
 				console.error("Context Broker "+cb+ ": path malformed.");
 				$('#statusLabel').text("Context Broker "+cb+ ": path malformed.");
 			}else if(jsonResponse=="not found\n"){
+				numOfGetRequests--;
+				if(!cbsWithErrors.includes(cb)){
+					cbsWithErrors.push(cb);
+				}
 				console.error("Context Broker "+cb+ " not found.");
 				$('#statusLabel').text("Context Broker "+cb+ " not found.");
 			}else{
@@ -233,6 +246,12 @@ function activateStub(protocol,cb,ip,port,accesslink,accessport,path,organizatio
 				}
 				//console.log(devices);
 				saveFoundDevices(devices);
+				numOfReturnedGetRequests++;
+			}
+			if(numOfReturnedGetRequests==numOfGetRequests){
+				console.log("Got all devices from external CBs. There are "+foundDevices.length+" devices.");
+				// now we can proceed in getting all pre-existing external devices on the IOT, so we can later compare the two sets
+				getPreExistingExternalDevices();
 			}
 		}
 	});
@@ -247,12 +266,6 @@ function activateStub(protocol,cb,ip,port,accesslink,accessport,path,organizatio
 function saveFoundDevices(devices){
 	for(let i =0; i<devices.length;i++){
 		foundDevices.push(devices[i]);
-	}
-	numOfReturnedGetRequests++;
-	if(numOfReturnedGetRequests==numOfGetRequests){
-		console.log("Got all devices from external CBs. There are "+foundDevices.length+" devices.");
-		// now we can proceed in getting all pre-existing external devices on the IOT, so we can later compare the two sets
-		getPreExistingExternalDevices();
 	}
 }
 
@@ -379,28 +392,30 @@ function buildD3Tree(){
 						.attr("fill-opacity", 0)
 						.attr("stroke-opacity", 0)
 						.on("click", d => {
-							//se è un path apri i children
-							d.children = d.children ? null : d._children;
-							//se è un device "verde" apre il dialog per l'edit
-							if(d.data.preExisting!=undefined && d.data.preExisting==false){
-								openEditDialog(d);
+							if(d.data.error==undefined || d.data.error == false){
+								//se è un path apri i children
+								d.children = d.children ? null : d._children;
+								//se è un device "verde" apre il dialog per l'edit
+								if(d.data.preExisting!=undefined && d.data.preExisting==false){
+									openEditDialog(d);
+								}
+								update(d);
 							}
-							update(d);
 						});
 
 					nodeEnter.append("circle")
 						.attr("r", 6.5)
 						.attr("stroke", d => d.depth<=2 ? "lightgrey" : (d._children ? "lightgrey" : ((d.data.preExisting!=undefined && d.data.preExisting==false)?"white":"blue")))
 						.attr("stroke-width", 2)
-						.attr("fill", d => d.depth<=2 ? "grey" : (d._children ? "grey" : ((d.data.preExisting!=undefined && d.data.preExisting==false)?"green":"white")))
+						.attr("fill", d => (d.depth == 1 && d.data.error!=undefined && d.data.error == true) ? "red" : (d.depth<=2 ? "grey" : (d._children ? "grey" : ((d.data.preExisting!=undefined && d.data.preExisting==false)?"green":"white"))))
 						.attr("cursor", d => (d._children || (d.data.preExisting!=undefined && d.data.preExisting==false)) ? "pointer" : "default");
 
 					nodeEnter.append("text")
-						.attr("fill", d => d.depth<=2 ? "black" : ((d.data.preExisting!=undefined && d.data.preExisting==false)?"white":"black"))
+						.attr("fill", d => (d.depth == 1 && d.data.error!=undefined && d.data.error == true) ? "red" : (d.depth<=2 ? "black" : ((d.data.preExisting!=undefined && d.data.preExisting==false)?"white":"black")))
 						.attr("class", "tree-nodes-label")
 						.attr("dy", "0.5em")
-						.attr("x", d => d._children ? -6 : 6)
-						.attr("text-anchor", d => d._children ? "end" : "start")
+						.attr("x", d => (d.depth == 1 && d.data.error!=undefined && d.data.error == true) ? -10 : (d._children ? -12 : 12))
+						.attr("text-anchor", d => (d.depth == 1 && d.data.error!=undefined && d.data.error == true) ? "end" :(d._children ? "end" : "start"))
 						.attr("font-size", d => d.depth === 0 ? 20: 16)
 						.attr("cursor", d => (d._children || (d.data.preExisting!=undefined && d.data.preExisting==false)) ? "pointer" : "default")
 						.text(d => d.data.name)
@@ -480,52 +495,57 @@ function getD3HierarchyFromData(){
 	let brokers = [];
 	for(let i =0;i<cbs.length;i++){
 		let cb = new Object({name: cbs[i].name});
-		let tenants = [];
-		for(let j=0;j<cbs[i].tenants.length;j++){
-			let tenant = new Object({name: cbs[i].tenants[j].name!=""?cbs[i].tenants[j].name:"DEFAULT TENANT"});
-			let paths = [];
+		if (cbsWithErrors.includes(cbs[i].name)){
+			cb.error = true;
+		}
+		else{
+			let tenants = [];
+			for(let j=0;j<cbs[i].tenants.length;j++){
+				let tenant = new Object({name: cbs[i].tenants[j].name!=""?cbs[i].tenants[j].name:"DEFAULT TENANT"});
+				let paths = [];
 
-			let pathsToScan = cbs[i].tenants[j].servicePaths;
+				let pathsToScan = cbs[i].tenants[j].servicePaths;
 
-			// now we take a look at the paths:
-			// we will have a list of paths like:
-			// path1/path1_1/path1_1_1, path1/path1_1/path1_1_2, path1/path1_2, etc.
-			// from which we have to build the same name/children structure as above,
-			// so we will have only one path1 with only two children path1_1 and path1_2,
-			// and path1_1 will have only two children path1_1_1 and path1_1_2.
-			for(let k=0;k<pathsToScan.length;k++){
-				let currentPath = pathsToScan[k].substring(1,pathsToScan[k].length);
-				if(currentPath!=""){
-					let pathSplit = currentPath.split("/");
+				// now we take a look at the paths:
+				// we will have a list of paths like:
+				// path1/path1_1/path1_1_1, path1/path1_1/path1_1_2, path1/path1_2, etc.
+				// from which we have to build the same name/children structure as above,
+				// so we will have only one path1 with only two children path1_1 and path1_2,
+				// and path1_1 will have only two children path1_1_1 and path1_1_2.
+				for(let k=0;k<pathsToScan.length;k++){
+					let currentPath = pathsToScan[k].substring(1,pathsToScan[k].length);
+					if(currentPath!=""){
+						let pathSplit = currentPath.split("/");
 
-					let tempPaths = paths;
-					for(let w = 0; w<pathSplit.length; w++){
-						let pathNames = [];
-						for(let x=0;x<tempPaths.length;x++){
-							pathNames.push(tempPaths[x].name);
-						}
-						if(!pathNames.includes(pathSplit[w])){
-							let path = new Object({name:pathSplit[w], children: []});
-							tempPaths.push(path);
-							pathNames.push(path.name);
-							tempPaths=path.children;
-						}else{
-							for(let x = 0; x<tempPaths.length;x++){
-								if(tempPaths[x].name == pathSplit[w]){
-									tempPaths = tempPaths[x].children;
+						let tempPaths = paths;
+						for(let w = 0; w<pathSplit.length; w++){
+							let pathNames = [];
+							for(let x=0;x<tempPaths.length;x++){
+								pathNames.push(tempPaths[x].name);
+							}
+							if(!pathNames.includes(pathSplit[w])){
+								let path = new Object({name:pathSplit[w], children: []});
+								tempPaths.push(path);
+								pathNames.push(path.name);
+								tempPaths=path.children;
+							}else{
+								for(let x = 0; x<tempPaths.length;x++){
+									if(tempPaths[x].name == pathSplit[w]){
+										tempPaths = tempPaths[x].children;
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-			//console.log(cb.name+", "+tenant.name+": ");
-			//console.log("Paths: "+paths);
+				//console.log(cb.name+", "+tenant.name+": ");
+				//console.log("Paths: "+paths);
 
-			tenant.children = paths;
-			tenants.push(tenant);
+				tenant.children = paths;
+				tenants.push(tenant);
+			}
+			cb.children = tenants;
 		}
-		cb.children = tenants;
 		brokers.push(cb);
 	}
 	hierarchy.children = brokers;
@@ -571,7 +591,7 @@ function putDevicesInTree(tree){
 								}
 							}
 						}
-						// check if devices already exixts in the IOT Directory
+						// check if devices already exists in the IOT Directory
 						let deviceToPut = new Object({name: foundDevices[i].id, preExisting: false,
 							contextBroker: foundDevices[i].contextBroker,
 							latitude: foundDevices[i].latitude, longitude: foundDevices[i].longitude,
