@@ -306,10 +306,10 @@ function buildD3Tree(){
 
 	const data = getD3HierarchyFromData();
 
-	const width = 960;
+	const width = 1920;
 	const dx = 30;
-	const margin = new Object({top: 48, right: 0, bottom: 48, left: 24});
-	const dy = (width / 6) - margin.left - margin.right;
+	const margin = new Object({top: 48, right: 0, bottom: 48, left: 48});
+	const dy = (width / 8) - margin.left - margin.right;
 	const tree = d3.tree().nodeSize([dx, dy]);
 	const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
 	const root = d3.hierarchy(data);

@@ -354,7 +354,7 @@ else
                                 <button type="text" id="startDiscoveryButton" name="startDiscoveryButton" class="btn btn-info" disabled>Start Discovery</button>
                             </div>
                             <div id="app">
-                                <svg width="960" height="500"></svg>
+                                <svg width="1920" height="1080" overflow=auto white-space=nowrap></svg>
                                 <script src="https://d3js.org/d3.v5.min.js"></script>
                             </div>
                         </div>
