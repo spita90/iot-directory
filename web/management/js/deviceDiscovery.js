@@ -390,13 +390,13 @@ function buildD3Tree(){
 
 					nodeEnter.append("circle")
 						.attr("r", 6.5)
-						.attr("stroke", d => d._children ? "#3c72d7" : "#949494")
+						.attr("stroke", d => d.depth<=2 ? "lightgrey" : (d._children ? "lightgrey" : ((d.data.preExisting!=undefined && d.data.preExisting==false)?"white":"blue")))
 						.attr("stroke-width", 2)
-						.attr("fill", d => ((d.data.preExisting!=undefined && d.data.preExisting==false)?"green":"white"))
+						.attr("fill", d => d.depth<=2 ? "grey" : (d._children ? "grey" : ((d.data.preExisting!=undefined && d.data.preExisting==false)?"green":"white")))
 						.attr("cursor", d => (d._children || (d.data.preExisting!=undefined && d.data.preExisting==false)) ? "pointer" : "default");
 
 					nodeEnter.append("text")
-						.attr("fill", d => ((d.data.preExisting!=undefined && d.data.preExisting==false)?"white":"black"))
+						.attr("fill", d => d.depth<=2 ? "black" : ((d.data.preExisting!=undefined && d.data.preExisting==false)?"white":"black"))
 						.attr("class", "tree-nodes-label")
 						.attr("dy", "0.5em")
 						.attr("x", d => d._children ? -6 : 6)
@@ -407,7 +407,7 @@ function buildD3Tree(){
 						.clone(true).lower()
 						.attr("aria-hidden", "true") // hide duplicate text from screen readers / assistive tech
 						.style("user-select", "none")
-						.attr("stroke", d => ((d.data.preExisting!=undefined && d.data.preExisting==false)?"green":"white"))
+						.attr("stroke", d => d.depth<=2 ? "lightgrey" : (d._children ? "lightgrey" : ((d.data.preExisting!=undefined && d.data.preExisting==false)?"green":"white")))
 						.attr("stroke-linejoin", "round")
 						.attr("stroke-width", 3);
 
