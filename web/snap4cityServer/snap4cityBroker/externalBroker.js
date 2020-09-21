@@ -153,6 +153,10 @@ if(PATH == undefined || PATH.localeCompare("null")==0 || PATH.localeCompare("")=
 else{
 	link = ACCESS_LINK+ PATH;	
 }
+
+//AS FIX
+link += "/v2/entities";
+
 if(!link.includes(DEVICE_NAME)){
 	console.log("include");
 	let link_provv = link.split("?");

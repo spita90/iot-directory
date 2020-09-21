@@ -149,13 +149,13 @@ if ($action=="insert")
 		        if($result["status"]=='ok'){
                 		logAction($link,$username,'contextbroker','insert',$name,$organization,'Registering the ownership of CB','success');
 
-				//if internal and ngsi, try to subscribe
-				if ($kind === "internal" && (strpos($protocol,'ngsi')!==false))
+				//try to subscribe
+				if (strpos($protocol,'ngsi')!==false || strpos($protocol,'ngsi w/MultiService')!==false)
 				{
 					nificallback_create($ip, $port, $name, $urlnificallback, $protocol, $services, $result);//TODO uniform with below (update scenario), same code is there
 					//save subscription_id
 	        		        $q = "UPDATE contextbroker SET subscription_id='".$result["content"]."' WHERE name='$name';";
-					error_log("update wuery:".$q);
+					error_log("update query:".$q);
 			                $r = mysqli_query($link, $q);
         			        if($r)
 		                	{
@@ -173,7 +173,6 @@ if ($action=="insert")
                 	                                   mysqli_error($link) . ' Please enter again the context broker';
 			                }
 				}
-				
 			}
 			else
 			{
@@ -383,10 +382,10 @@ else if ($action=="delete")
 	$r = mysqli_query($link, $q);
 	if($r)
 	{
-		//if internal and ngsi, try to unsubscribe
+		//try to unsubscribe
 		while($row = mysqli_fetch_assoc($r))
 		{
-		        if ($row["kind"] === "internal" && (strpos($row["protocol"],'ngsi')!==false))
+		        if (strpos($row["protocol"],'ngsi')!==false || strpos($row["protocol"],'ngsi w/MultiService')!==false)
         		{
 				$servicesQueryString = "SELECT * FROM services WHERE broker_name = '$name'";
 				$sqr = mysqli_query($link, $servicesQueryString);

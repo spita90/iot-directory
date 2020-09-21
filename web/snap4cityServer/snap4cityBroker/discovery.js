@@ -108,6 +108,9 @@ else{
 	link = ACCESS_LINK+ CB_PATH;
 }
 
+//AS FIX
+link += "/v2/entities";
+
 var xhttp = new XMLHttpRequest();
 
 retrieveData(xhttp, link);

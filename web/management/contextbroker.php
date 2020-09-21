@@ -578,6 +578,7 @@
 							<input type="text" class="modalInputTxt" name="inputUrlOrionCallback" id="inputUrlOrionCallback">
 						</div>
 						<div class="modalFieldLabelCnt">Url Orion Callback</div>
+						<div id="selectUrlOrionCallbackMsgHint" class="modalFieldMsgCnt">ATTENZIONE: La callback uri deve essere visibile e raggiungibile dall'esterno</div>
 						<div id="selectUrlOrionCallbackMsg" class="modalFieldMsgCnt">&nbsp;</div>
 					</div>
 				</div>
@@ -883,6 +884,7 @@
                                                         <input type="text" class="modalInputTxt" name="inputUrlOrionCallbackM" id="inputUrlOrionCallbackM">
                                                 </div>
                                                 <div id="urlOrionCallbackLabelM" class="modalFieldLabelCnt">Url Orion Callback</div>
+                                                <div id="selectUrlOrionCallbackMsgHintM" class="modalFieldMsgCnt">ATTENZIONE: La callback uri deve essere visibile e raggiungibile dall'esterno</div>
                                                 <div id="selectUrlOrionCallbackMsgM" class="modalFieldMsgCnt">&nbsp;</div>
                                         </div>
                                 </div>

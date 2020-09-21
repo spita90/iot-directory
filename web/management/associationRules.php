@@ -584,10 +584,10 @@ else
                     <div class="modal-body">
 
                         <div id="selectBroker" class="col-xs-12 mainContentRowDesc" >
-                            <div id="selectBrokersActive" class="col-xs-12 col-md-6">
+                            <div id="selectBrokersActive" class="col-xs-12 col-md-8">
                                 <select id="activeInactiveBrokes"></select>
                             </div>
-							<div class="col-xs-12 col-md-6">
+							<div class="col-xs-12 col-md-8">
 								<button type="button" id="activateButton" class="btn btn-success" style="display: none;">Activate</button>
 								<button type="button" id="inactivateButton" class="btn btn-danger"  >Inactivate</button>
 							</div>

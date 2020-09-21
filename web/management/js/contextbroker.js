@@ -713,9 +713,9 @@ function format ( d ) {
 			{
 				$("#substatusCBMMsg").text("The automatic subscription is disabled");
 				//disable the uri
-				$("#inputUrlOrionCallbackM").hide();
-				$("#urlOrionCallbackLabelM").hide();
-				$("#selectUrlOrionCallbackMsgM").hide();
+				//$("#inputUrlOrionCallbackM").hide();
+				//$("#urlOrionCallbackLabelM").hide();
+				//$("#selectUrlOrionCallbackMsgM").hide();
 			}
 			else if ($(this).attr("data-subscription_id")=="FAILED")
 			{
@@ -725,6 +725,7 @@ function format ( d ) {
 				$("#substatusCBMMsg").text("Subscription id:\n"+$(this).attr("data-subscription_id").replace(/,/g,"\n"));
 			}
 			$("#inputUrlOrionCallbackM").val($(this).attr("data-urlnificallback"));
+			/*	//AS FIX - I want to be able to add subscriptions also in case of external CB
 			if ($(this).attr("data-kind") === "internal" && $(this).attr("data-protocol"))
 			{
 				$("#tab-editCB-4").show();
@@ -733,6 +734,8 @@ function format ( d ) {
 			{
 				$("#tab-editCB-4").hide();
 			}
+
+			 */
 			editCBSManagementButtonPressed($(this).attr("data-services"));
 			showEditCbModal();
 	});
@@ -903,7 +906,7 @@ function format ( d ) {
 	$('#addContextBrokerBtn').off('click');
 	$('#addContextBrokerBtn').click(function (){
 	
-		$("#tab-addCB-4").hide();
+		//$("#tab-addCB-4").hide();
 	
 		$('#addContextBrokerModalTabs').show();
 		$('#addContextBrokerModalBody').show();	
@@ -1287,7 +1290,7 @@ function format ( d ) {
 		//related to subscription tab
                 var kind_value = document.getElementById("selectKindCB").value;
 
-
+				/*	//AS FIX - I want to be able to add subscriptions also in case of external CB
                 if(kind_value ==='internal' && value.indexOf('ngsi')!=-1)
                 {
                         $("#tab-addCB-4").show();
@@ -1296,6 +1299,8 @@ function format ( d ) {
                 {
                         $("#tab-addCB-4").hide();
                 }
+
+				 */
 
 	});
 
@@ -1342,7 +1347,7 @@ function format ( d ) {
 		var protocol_value = document.getElementById("selectProtocolCB").value;
 
 
-
+		/*		//AS FIX - I want to be able to add subscriptions also in case of external CB
 		if(value ==='internal' && protocol_value.indexOf('ngsi')!=-1)	
 		{
 			$("#tab-addCB-4").show();
@@ -1351,6 +1356,8 @@ function format ( d ) {
 		{
 			$("#tab-addCB-4").hide();
 		}
+
+		 */
 	
 	});
 
@@ -1360,7 +1367,7 @@ function format ( d ) {
                 //related to subscription tab
                 var kind_value = document.getElementById("selectKindCBM").value;
 
-
+				/*	//AS FIX - I want to be able to add subscriptions also in case of external CB
                 if(kind_value ==='internal' && value.indexOf('ngsi')!=-1)
                 {
                         $("#tab-editCB-4").show();
@@ -1369,6 +1376,8 @@ function format ( d ) {
                 {
                         $("#tab-editCB-4").hide();
                 }
+
+				 */
 
         });
 
@@ -1381,7 +1390,7 @@ function format ( d ) {
                 //related to subscription tab
                 var protocol_value = document.getElementById("selectProtocolCBM").value;
 
-
+				/* //AS FIX - I want to be able to add subscriptions also in case of external CB
                 if(value ==='internal' && protocol_value.indexOf('ngsi')!=-1)
                 {
                         $("#tab-editCB-4").show();
@@ -1391,6 +1400,8 @@ function format ( d ) {
                         $("#tab-editCB-4").hide();
                 }
 
+				 */
+
         });
 
 
@@ -1398,7 +1409,7 @@ function format ( d ) {
 	//Validation of the name of the new owner during typing
 	$('#newOwner').on('input',function(e)
 	{
-		
+
 		if($(this).val().trim() === '')
 		{
 			$('#newOwnerMsg').css('color', '#f3cf58');
@@ -1409,7 +1420,7 @@ function format ( d ) {
 		{
 			//if(($(this).val().trim() === "<?= $_SESSION['loggedUsername'] ?>")&&("<?= $_SESSION['loggedRole'] ?>" !== "RootAdmin"))
 			if(($(this).val().trim() === loggedUser)&&(loggedRole !== "RootAdmin") && (loggedRole !== "ToolAdmin"))
-				
+
 			{
 				$('#newOwnerMsg').css('color', '#f3cf58');
 				$('#newOwnerMsg').html('New owner can\'t be you');
@@ -1422,8 +1433,8 @@ function format ( d ) {
 				$('#newOwnershipConfirmBtn').removeClass('disabled');
 			}
 		}
-	}); 
-	
+	});
+
 		// DELEGATIONS
 function updateGroupList(ouname){
        $.ajax({
@@ -1590,27 +1601,27 @@ function updateGroupList(ouname){
        $('#delegationsModal').on('hidden.bs.modal', function(e)
        {
                $(this).removeData();
-       });				
-		
-}); // end of ready function			
-			
+       });
+
+}); // end of ready function
+
 			var internalDest = false;
             var tableFirstLoad = true;
-			
+
 			 $('.internalLink').on('mousedown', function(){
                 internalDest = true;
             });
-			
+
             setGlobals(loggedRole, usr, loggedType, userVisibilitySet);
-            
+
             $("#logoutBtn").off("click");
             $("#logoutBtn").click(function(event)
             {
                event.preventDefault();
                location.href = "logout.php";
-               
+
             });
-            
+
 			function updateCBTimeout()
 			{
 				$("#editCBOkModal").modal('hide');
@@ -1618,15 +1629,15 @@ function updateGroupList(ouname){
 				   location.reload();
 				}, 500);
 			}
-        
 
-		
-		
-//   START TO CHANGE THE VISIBILITY  & OWNERSHIP 
-				
-	function changeVisibility(name, visibility,obj_organization, accesslink) {	   	   
-		$("#delegationsModal").modal('show');   
-	    $("#delegationHeadModalLabel").html("Device - " + name);   			
+
+
+
+//   START TO CHANGE THE VISIBILITY  & OWNERSHIP
+
+	function changeVisibility(name, visibility,obj_organization, accesslink) {
+		$("#delegationsModal").modal('show');
+	    $("#delegationHeadModalLabel").html("Device - " + name);
 
         if(visibility=='MyOwnPrivate'){
 				newVisibility = 'public';
@@ -1634,24 +1645,24 @@ function updateGroupList(ouname){
 				$("#visID").html("Visibility - Private");
 				document.getElementById('newVisibilityPrivateBtn').style.visibility = 'hidden';
 				document.getElementById('newVisibilityPublicBtn').style.visibility = 'show';
-				
+
 			} else
-				
+
             {
 				newVisibility = 'private';
 				$('#visID').css('color', '#f3cf58');
 				$("#visID").html("Visibility - Public");
 				document.getElementById('newVisibilityPrivateBtn').style.visibility = 'show';
 				document.getElementById('newVisibilityPublicBtn').style.visibility = 'hidden';
-			}			  
-	   
-		$(document).on("click", "#newVisibilityPublicBtn", function(event){	
+			}
+
+		$(document).on("click", "#newVisibilityPublicBtn", function(event){
 			$.ajax({
 				url: "../api/contextbroker.php",
-				data: 
-				{	
+				data:
+				{
 					action: "change_visibility",
-					username: loggedUser,					
+					username: loggedUser,
 					organization : organization,
 					obj_organization : obj_organization,
                     name:name,
@@ -1664,7 +1675,7 @@ function updateGroupList(ouname){
 				type: "POST",
 				async: true,
 				dataType: 'json',
-				success: function(data) 
+				success: function(data)
 				{
 					if (data["status"] === 'ok')
 					{
@@ -1673,9 +1684,9 @@ function updateGroupList(ouname){
 						$('#visID').css('color', '#f3cf58');
 						$("#visID").html("Visibility - Private");
 						$('#newVisibilityResultMsg').html('New visibility set to Public');
-						
+
 						$('#newVisibilityPublicBtn').addClass('disabled');
-						
+
 						setTimeout(function()
 						{
 							$('#devicesTable').DataTable().destroy();
@@ -1688,7 +1699,7 @@ function updateGroupList(ouname){
 						$('#newVisibilityResultMsg').show();
 						$('#newVisibilityResultMsg').html('Error setting new visibility');
 						$('#newVisibilityPublicBtn').addClass('disabled');
-						
+
 						setTimeout(function()
 						{
 							$('#newVisibilityPublicBtn').removeClass('disabled');
@@ -1713,17 +1724,17 @@ function updateGroupList(ouname){
 				}
 			});
 		});
-		
-		
+
+
 		$(document).on("click", "#newVisibilityPrivateBtn", function(event){
 		$.ajax({
 				url: "../api/contextbroker.php",
-				data: 
-				{	
-					action: "change_visibility", 
+				data:
+				{
+					action: "change_visibility",
 					username: loggedUser,
-					organization : organization, 
-					obj_organization : obj_organization, 
+					organization : organization,
+					obj_organization : obj_organization,
 					name: name,
                     object:"BrokerID",
                     table:"contextbroker",
@@ -1733,8 +1744,8 @@ function updateGroupList(ouname){
 					},
 					type: "POST",
 					async: true,
-					dataType: 'json',	
-            success: function(data) 
+					dataType: 'json',
+            success: function(data)
 				{
 					if (data["status"] === 'ok')
 					{
@@ -1746,14 +1757,14 @@ function updateGroupList(ouname){
 							$('#devicesTable').DataTable().destroy();
 							fetch_data(true);
 							location.reload();
-						}, 3000); 
+						}, 3000);
 					}
 					else if (data["status"] === 'ko')
 					{
 						$('#newVisibilityResultMsg').show();
 						$('#newVisibilityResultMsg').html('Error setting new visibility');
 						$('#newVisibilityPrivateBtn').addClass('disabled');
-						
+
 						setTimeout(function()
 						{
 							$('#newVisibilityPrivateBtn').removeClass('disabled');
@@ -1777,8 +1788,8 @@ function updateGroupList(ouname){
 					}, 3000);
 				}
 			});
-		});		
-	   
+		});
+
 	$(document).on("click", "#newOwnershipConfirmBtn", function(event){
 				$.ajax({
 				 url: "../api/contextbroker.php",
@@ -1788,16 +1799,16 @@ function updateGroupList(ouname){
                  object:"BrokerID",
 				 name: name,
 				 accesslink: accesslink,
-				 organization : organization, 
-				 obj_organization : obj_organization, 
+				 organization : organization,
+				 obj_organization : obj_organization,
 				 owner: loggedUser,
 				 newOwner:  $('#newOwner').val(),
 				 token : sessionToken
-			 },	
+			 },
 			type: "POST",
 			async: true,
 			dataType: 'json',
-			success: function(data) 
+			success: function(data)
 			{
 				if (data["status"] === 'ok')
 				{
@@ -1806,8 +1817,8 @@ function updateGroupList(ouname){
 					$('#newOwnershipResultMsg').show();
 					$('#newOwnershipResultMsg').html('New ownership set correctly');
 					$('#newOwnershipConfirmBtn').addClass('disabled');
-					
-					
+
+
 					setTimeout(function()
 					{
 						$('#devicesTable').DataTable().destroy();
@@ -1820,7 +1831,7 @@ function updateGroupList(ouname){
 					$('#newOwner').addClass('disabled');
 					$('#newOwnershipResultMsg').html('Error setting new ownership: please try again');
 					$('#newOwnershipConfirmBtn').addClass('disabled');
-					
+
 					setTimeout(function()
 					{
 						$('#newOwner').removeClass('disabled');
@@ -1844,28 +1855,28 @@ function updateGroupList(ouname){
 				}, 3000);
 			}
 		});
-	});  
-	
+	});
+
 
 
 	$("#delegationsCancelBtn").off("click");
-	$("#delegationsCancelBtn").on('click', function(){        
+	$("#delegationsCancelBtn").on('click', function(){
 		$('#newDelegation').val("");
                 $('#newDelegationGroup').val("");
-                $('#newDelegationOrganization').val("");  
+                $('#newDelegationOrganization').val("");
 		$('#newOwner').val("");
 		  $("#newVisibilityResultMsg").html("");
 		  $("#newOwnershipResultMsg").html("");
-		   location.reload(); 
-		  $('#delegationsModal').modal('hide'); 		    								  		
+		   location.reload();
+		  $('#delegationsModal').modal('hide');
 	});
-			
+
 
        $.ajax({
 			url: "../api/contextbroker.php",   //Checking the delegation table
 		   data:
 			{
-													   
+
                 action: "get_delegations",  // check the action and to be specified
                 accesslink: accesslink,
                 obj_organization:obj_organization,
@@ -1879,27 +1890,27 @@ function updateGroupList(ouname){
 			dataType: 'json',
 			success: function(data)
 			{
-					   
+
                 if (data["status"]=='ok')
                 {
-					   
+
                     console.log(JSON.stringify(data));																					   delegations = data["delegation"];
-                    $('#delegationsTable tbody').html("");   
+                    $('#delegationsTable tbody').html("");
                     $('#delegationsTableGroup tbody').html("");
-			          
+
                     for(var i = 0; i < delegations.length; i++)
 			   {
-		
+
                    if ((delegations[i].userDelegated !="ANONYMOUS")&&(delegations[i].userDelegated!=null)) {
-			   
-			   
+
+
                        $('#delegationsTable tbody').append('<tr class="delegationTableRow" data-delegationId="' + delegations[i].delegationId + '" data-delegated="' + delegations[i].userDelegated + '"><td class="delegatedName">' + delegations[i].userDelegated + '</td><td><i class="fa fa-remove removeDelegationBtn"></i></td></tr>');
 
-	   
+
                    }
-	   
+
                    else  if (delegations[i].groupDelegated !=null){
-			   
+
                        //extract cn and ou
                        var startindex=delegations[i].groupDelegated.indexOf("cn=");
                        var endindex_gr= delegations[i].groupDelegated.indexOf(",");
@@ -1907,19 +1918,19 @@ function updateGroupList(ouname){
                        var endindex_ou=delegations[i].groupDelegated.indexOf(",", endindex_gr+1);
                        var ou=delegations[i].groupDelegated.substring(endindex_gr+4, endindex_ou);
 
-			   
+
                        var DN="";
                        if (startindex!=-1){
                            DN=ou+","+gr;
                        }
-			   
+
                        else{
                            DN=gr;
                        }
 
-			   
+
                        $('#delegationsTableGroup tbody').append('<tr class="delegationTableRowGroup" data-delegationId="' + delegations[i].delegationId + '" data-delegated="' + ou + "," +gr+ '"><td class="delegatedName">' + DN + '</td><td><i class="fa fa-remove removeDelegationBtnGroup"></i></td></tr>');
-	   
+
                    }
 
                }
@@ -1963,32 +1974,32 @@ function updateGroupList(ouname){
                                 action: "remove_delegation",
                                 token : sessionToken,
                                 user : loggedUser,
-                                delegationId: $(this).parents('tr').attr('data-delegationId')				   
-                            },				   
+                                delegationId: $(this).parents('tr').attr('data-delegationId')
+                            },
                             type: "POST",
                             async: true,
                             dataType: 'json',
-                            success: function(data)				   
+                            success: function(data)
                             {
                                 if (data["status"] === 'ok')
                                 {
-                                    rowToRemove.remove();	
+                                    rowToRemove.remove();
                                 }
                                 else
                                 {
-                                   console.log("error removing delegation");	
-                                }	
+                                   console.log("error removing delegation");
+                                }
                             },
                             error: function(errorData)
                             {
                                 console.log("error in the call ro remove delegation");
 							}
-                        });	
+                        });
                     });
 
                 }
                 else
-				{				 
+				{
 				console.log(json_encode(data));
 				}
 				},
@@ -2080,7 +2091,7 @@ function updateGroupList(ouname){
 
        //group delegation -start------------------------------------------------------------------------------------------------------------
         $(document).on("click", "#newDelegationConfirmBtnGroup", function(event){
-               
+
             var delegatedDN="";
                var e = document.getElementById("newDelegationGroup");
                if ((typeof e.options[e.selectedIndex] !== 'undefined')&&(e.options[e.selectedIndex].text!=='All groups')){
@@ -2153,14 +2164,14 @@ function updateGroupList(ouname){
 			   }
                });
        });     //group delegation -end
-	
+
 	}
 
-// END TO CHANGE THE VISIBILITY 		
-    
-	
-	
-		
+// END TO CHANGE THE VISIBILITY
+
+
+
+
 /* Related to the Map */
 	
 		

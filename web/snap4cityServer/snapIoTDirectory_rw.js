@@ -114,6 +114,72 @@ router.route('/ngsi')
 	}  
 });
 
+router.route('/ngsi w/Multiservice')
+	.post(function(req, res) {
+		var args = [];
+
+		//console.log(req);
+
+		if(registeredStub.get(req.body.contextbroker) != undefined)
+		{
+			if(req.body.ip == "kill"){
+				registeredStub.get(req.body.contextbroker).kill();
+				registeredStub.delete(req.body.contextbroker);
+
+				var brokerActive = 'killing ' + req.body.contextbroker;
+				if(registeredStub.size == 0){
+					brokerActive += '. There are no active brokers left.';
+				}
+				else{
+					brokerActive += '. Broker still active: ';
+
+					for (var key of registeredStub.keys()) {
+						brokerActive += key +"; ";
+					}
+				}
+				console.log(brokerActive);
+
+			}else{
+				console.log("Broker "+ req.body.contextbroker + " is already active.");
+				res.json({ message: 'stub already active for ORION context broker ' + req.body.contextbroker});
+			}
+		}
+		else
+		{
+			console.log("Retrieval from "+ req.body.contextbroker + " activated.");
+			//registeredStub.push(req.body.contextbroker);
+
+			args= ['./snap4cityBroker/ngsi2IoTDirectory_rw.js',
+				req.body.contextbroker,
+				req.body.ip,
+				req.body.user,
+				req.body.al,
+				req.body.model,
+				req.body.edge_gateway_type,
+				req.body.edge_gateway_uri,
+				req.body.organization,
+				req.body.path,
+				req.body.kind,
+				req.body.apikey
+			];
+
+			console.log(args);
+
+			const child_ngsi = spawn('node',args, {
+				//  detached: true,
+				stdio: 'inherit'
+			});
+
+			registeredStub.set(req.body.contextbroker, child_ngsi);
+
+			var regBroker = "Broker registered: ";
+			for (var key of registeredStub.keys()) {
+				regBroker += key + "; ";
+			}
+			console.log(regBroker);
+			// child.unref();
+		}
+	});
 
 router.route('/nodered-ngsi')
  .post(function(req, res) {
