@@ -51,6 +51,8 @@ $.ajax({url: "../api/contextBrokerRetrieval_e.php",
 });
 
 $('#startDiscoveryButton').click( function() {
+	$('#startDiscoveryButton').text("Discovering: Please wait...");
+	$('#startDiscoveryButton').prop('disabled', true);
 	console.log("Discovery started");
 	$('#statusLabel').show();
 	$('#app').hide();
@@ -245,7 +247,9 @@ function activateStub(protocol,cb,ip,port,accesslink,accessport,path,organizatio
 					devices.push(device);
 				}
 				//console.log(devices);
-				saveFoundDevices(devices);
+				for(let i =0; i<devices.length;i++){
+					foundDevices.push(devices[i]);
+				}
 				numOfReturnedGetRequests++;
 			}
 			if(numOfReturnedGetRequests==numOfGetRequests){
@@ -261,12 +265,6 @@ function activateStub(protocol,cb,ip,port,accesslink,accessport,path,organizatio
 	xhr.setRequestHeader('Cache-Control', 'no-cache');
 	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
 	xhr.send(data);
-}
-
-function saveFoundDevices(devices){
-	for(let i =0; i<devices.length;i++){
-		foundDevices.push(devices[i]);
-	}
 }
 
 function getPreExistingExternalDevices(){
@@ -479,6 +477,8 @@ function buildD3Tree(){
 
 	update(root);
 
+	$('#startDiscoveryButton').text("Start Discovery");
+	$('#startDiscoveryButton').prop('disabled', false);
 	$('#app').show();
 	$('#statusLabel').hide();
 	$('#colorsHint').show();
