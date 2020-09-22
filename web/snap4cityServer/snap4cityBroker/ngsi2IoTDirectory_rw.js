@@ -127,9 +127,8 @@ else{
 
 	}
 }
-	if(ORION_CB=="iotobsf"){
-		link+="/v2/entities";
-	}
+
+link+="/v2/entities";
 
 	console.log(ORION_CB);
 
