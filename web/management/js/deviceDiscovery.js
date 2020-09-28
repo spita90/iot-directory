@@ -58,6 +58,7 @@ $('#startDiscoveryButton').click( function() {
 	$('#app').hide();
 
 	cbs = [];
+	cbsWithErrors = []
 	foundDevices = [];
 	preExistingDevices = [];
 	numOfGetRequests = 0;
@@ -220,23 +221,23 @@ function activateStub(protocol,cb,ip,port,accesslink,accessport,path,organizatio
 				numOfGetRequests--;
 				if(!cbsWithErrors.includes(cb)){
 					cbsWithErrors.push(cb);
+					console.error("Context Broker "+cb+ " is not reachable.");
+					$('#statusLabel').text("Context Broker "+cb+ " is not reachable.");
 				}
-				console.error("Context Broker "+cb+ " is not reachable.");
-				$('#statusLabel').text("Context Broker "+cb+ " is not reachable.");
 			}else if(jsonResponse=="path malformed\n"){
 				numOfGetRequests--;
 				if(!cbsWithErrors.includes(cb)){
 					cbsWithErrors.push(cb);
+					console.error("Context Broker "+cb+ ": path malformed.");
+					$('#statusLabel').text("Context Broker "+cb+ ": path malformed.");
 				}
-				console.error("Context Broker "+cb+ ": path malformed.");
-				$('#statusLabel').text("Context Broker "+cb+ ": path malformed.");
 			}else if(jsonResponse=="not found\n"){
 				numOfGetRequests--;
 				if(!cbsWithErrors.includes(cb)){
 					cbsWithErrors.push(cb);
+					console.error("Context Broker "+cb+ " not found.");
+					$('#statusLabel').text("Context Broker "+cb+ " not found.");
 				}
-				console.error("Context Broker "+cb+ " not found.");
-				$('#statusLabel').text("Context Broker "+cb+ " not found.");
 			}else{
 				let devices = [];
 				for(let i =0; i<jsonResponse.length;i++){
