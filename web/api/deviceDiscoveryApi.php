@@ -201,7 +201,52 @@ else if ($action == "get_all_ext_devices_in_iot_dir")
         }
 	mysqli_close($link);
 }
+else if ($action=="getCBServiceTree") {
 
+         $contextbroker = mysqli_real_escape_string($link, $_REQUEST['contextbroker']);
+
+         $res=array();
+
+         $q = "SELECT DISTINCT d.service, d.servicePath
+               FROM devices d JOIN contextbroker c on d.contextBroker = c.name
+               WHERE c.name LIKE '$contextbroker'
+               UNION
+               SELECT DISTINCT dd.service, dd.servicePath
+               FROM deleted_devices dd JOIN contextbroker c on dd.contextBroker = c.name
+               WHERE c.name LIKE '$contextbroker'
+               UNION
+               SELECT DISTINCT m.service, m.servicePath
+               FROM model m JOIN contextbroker c on m.contextBroker = c.name
+               WHERE c.name LIKE '$contextbroker'
+               UNION
+               SELECT DISTINCT s.name as service, '/' as servicePath
+               FROM contextbroker c LEFT JOIN services s ON c.name = s.broker_name
+               WHERE c.name LIKE 'MT_SP_ExternalContextBroker'
+               ORDER BY service, servicePath";
+         $r = mysqli_query($link, $q);
+
+         if($r)
+         {
+                 while($row = mysqli_fetch_assoc($r))
+                 {
+                     array_push($res, $row);
+
+                 }
+                 $result["status"]="ok";
+                 $result["content"]=$res;
+                 $result["log"]= "action=getCBServiceTree \r\n";
+         }
+         else
+         {
+                 $result["status"]="ko";
+                 $result['msg'] = mysqli_error($link);
+                 $result["log"]= "action=getCBServiceTree -" . " error " .  mysqli_error($link)  . "\r\n";
+         }
+
+         my_log($result);
+
+         mysqli_close($link);
+     }
 
 
 else

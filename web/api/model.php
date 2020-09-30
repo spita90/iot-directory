@@ -44,7 +44,6 @@ require '../sso/autoload.php';
 use Jumbojett\OpenIDConnectClient;
 
 
-$oidc = new OpenIDConnectClient($keycloakHostUri, $clientId, $clientSecret);
 
 if (isset($_REQUEST['nodered']))
 {
@@ -55,10 +54,10 @@ if (isset($_REQUEST['nodered']))
 else
 {
 if (isset($_REQUEST['token'])) {
-  $oidc->providerConfigParam(array('token_endpoint' => $keycloakHostUri.'/auth/realms/master/protocol/openid-connect/token'));
-
-  $tkn = $oidc->refreshToken($_REQUEST['token']);
-  $accessToken = $tkn->access_token;
+     $oidc = new OpenIDConnectClient($keycloakHostUri, $clientId, $clientSecret);
+          $oidc->providerConfigParam(array('token_endpoint' => $keycloakHostUri.'/auth/realms/master/protocol/openid-connect/token'));
+          $tkn = $oidc->refreshToken($_REQUEST['token']);
+          $accessToken = $tkn->access_token;
 }
 else $accessToken ="";//TODO throw an error directly here, instead of checking the presence in any APIS
 }

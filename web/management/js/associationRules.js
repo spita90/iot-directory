@@ -107,7 +107,7 @@ $.ajax({url: "../api/contextBrokerRetrieval_e.php",
 
 //Sara811 - Start
  $('#retrieveButton').click( function(){
-	 $('#retrieveButton').text("LOADING...PLEASE WAIT");
+	 $('#retrieveButton').text("LOADING...PLEASE WAIT 10 SECONDS");
 	 $('#retrieveButton').prop('disabled', true);
 
     var contextbroker= $('#selectContextBrokerLD').val();
@@ -182,7 +182,7 @@ function activateStub(cb,ipa,protocol,user,accesslink,model,edge_type,edge_uri,p
 	//console.log("data to be sent "+data);
 	//console.log("service "+ service);
 	var xhr = ajaxRequest();
-	setTimeout(() => { location.reload(); }, 1000);
+	setTimeout(() => { location.reload(); }, 10000);
 
 
 	xhr.addEventListener("readystatechange", function () {
@@ -257,7 +257,12 @@ function updateDeviceTimeout()
 			'<div class="col-xs-6 col-sm-6" style="background-color:#D6CADD;"><b>K1:</b>' + "  " + d.k1 + '</div>' +
 			'<div class="clearfix visible-xs"></div>' +
 			'<div class="col-xs-6 col-sm-6" style="background-color:#D6CADD;"><b>K2:</b>' + "  " + d.k2  + '</div>' +	
-		'</div>' + 
+		'</div>' +
+		'<div class="row">' +
+			'<div class="col-xs-6 col-sm-6" style="background-color:#AAAAFF;"><b>Tenant:</b>' + "  " + d.service + '</div>' +
+			'<div class="clearfix visible-xs"></div>' +
+			'<div class="col-xs-6 col-sm-6" style="background-color:#AAAAFF;"><b>ServicePath:</b>' + "  " + d.servicepath  + '</div>' +
+		'</div>' +
 	'</div>' ;
 	
 }
@@ -355,6 +360,8 @@ function fetch_data(destroyOld, selected=null)
 				'data-visibility="'+d.visibility+'" ' +
 				'data-frequency="'+d.frequency+'" ' +
 				'data-format="'+d.format+'" ' +
+					'data-service="'+d.service+'" ' +
+					'data-servicepath="'+d.servicepath+'" ' +
 				'data-ownership="'+d.ownership+'" ' +
 				'data-protocol="'+d.protocol+'" ' +
 				'data-macaddress="'+d.macaddress+'" ' +
@@ -1204,16 +1211,15 @@ function insertValidDevices(){
 				 };
 		
 	//../api/contextBrokerRetrieval_e.php
+	/*
 	$.post('../api/async_request_cb_retrieval_e.php', {'data' : data}, function(response_data) {
-		
-            /*var progress_modal = document.getElementById('myModal');
-            var span = document.getElementsByClassName("close")[0];
-            var spin = document.getElementById("loader_spin");
-            var progress_ok=document.getElementById('progress_ok');*/
 
-            //console.log("done contextBrokerRetrieva_e" + response_data);
+            console.log("done contextBrokerRetrieva_e" + response_data);
 			
 		});
+*/
+	$.post('../api/contextBrokerRetrieval_e.php', data);
+
     //alert("Request sent, processing ...");
     
     var progress_modal_b = document.getElementById('myModal_forbulkstatus');
@@ -1221,13 +1227,16 @@ function insertValidDevices(){
     var spin_b = document.getElementById("loader_spin_forbulkstatus");
     var progress_ok_b=document.getElementById('progress_ok_forbulkstatus');
 	var progress_stop_b=document.getElementById('progress_stop_forbulkstatus');
-    document.getElementById('myModalBody_forbulkstatus').innerHTML= "<p>Inserting the valid devices is being processed...</p> By clicking 'Ok' you will be redirected to the main page, but the process will be running anyway.";
+    document.getElementById('myModalBody_forbulkstatus').innerHTML= "<p>Inserting the valid devices is being processed...</p> Please click 'Ok'. This page will refresh in 10 seconds, but the process will take place in background.";
     progress_modal_b.style.display = "block";
     spin_b.style.display="none";
     progress_ok_b.style.display="block";
     progress_stop_b.style.display="block";
-    
-    checkBulkStatus();
+
+    setTimeout(function(){
+		location.reload();
+	}, 10000);
+    //checkBulkStatus();
     
     
 }
@@ -1427,7 +1436,6 @@ function insertValidDevicesByPieces(start_index,end_index,totalDevices,bulk_offs
 					//console.log("mydata[content] "+JSON.stringify(mydata['content']));
 				//Sara3110 - To remove waiting message
 				//document.getElementById('myModalBody').innerHTML = "";
-				
 				if (mydata['content'] != undefined){
 				 	var content = mydata['content'];
 					content = content[0];
@@ -2010,7 +2018,7 @@ $('#deleteAllDevConfirmBtn').off("click");
 $('#devicesTable tbody').on('click', 'button.editDashBtn', function () {
 	$("#editDeviceModalBody").show();
 	$('#editDeviceModalTabs').show();
-
+	$('#editDeviceConfirmBtn').attr("disabled", false);
 
 	  $("#editDeviceLoadingMsg").hide();
 	  $("#editDeviceLoadingIcon").hide();
@@ -2041,7 +2049,8 @@ $('#devicesTable tbody').on('click', 'button.editDashBtn', function () {
 	  var longitude = $(this).attr('data-longitude');
 	  var frequency = $(this).attr('data-frequency');
 	  var visibility = $(this).attr('data-visibility');
-	  
+	  var service = $(this).attr('data-service');
+	  var servicepath = $(this).attr('data-servicepath');
 	  var key1 = $(this).attr('data-k1');
 	  var key2 = $(this).attr('data-k2');
 	  // let's comment it now, we'll add it when we set the strategy to use 
@@ -2068,10 +2077,20 @@ $('#devicesTable tbody').on('click', 'button.editDashBtn', function () {
 	$('#inputLongitudeDeviceM').val(longitude);	
 	$('#inputFrequencyDeviceM').val(frequency);
 	$('#selectVisibilityDeviceM').val(visibility);
+	$('#deviceService').val(service);
+	$('#editInputServicePathDevice').val(servicepath);
 	  
 	$('#KeyOneDeviceUserM').val(key1);
 	$('#KeyTwoDeviceUserM').val(key2);
-	  
+
+
+	$('#selectContextBrokerM').attr("disabled", true);
+	$('#selectProtocolDeviceM').attr("disabled", true);
+	$('#deviceService').attr("disabled", true);
+	$('#editInputServicePathDevice').attr("disabled", true);
+	$('#inputNameDeviceM').attr("disabled", true);
+
+
 
 	$('#editDeviceModal').show();	
 
@@ -2133,6 +2152,8 @@ $('#devicesTable tbody').on('click', 'button.editDashBtn', function () {
 				$('#editlistAttributes').html("");	
 				$('#KeyOneDeviceUserM').val("");
 				$('#KeyTwoDeviceUserM').val("");
+				$('#deviceService').val("");
+				$('#editInputServicePathDevice').val("");
 											
 						   
 				// $("#editDeviceModal").modal('hide');
@@ -2274,7 +2295,7 @@ error messages returned by verifyDevice are longer.
 			//console.log("arrayAttributes "+JSON.stringify(arrayAttributes));
             
             //UPDATE FUNCTION
-			 var updatedDevice={"contextbroker":$('#selectContextBrokerM').val(),"name":$('#inputNameDeviceM').val(),"devicetype":$('#inputTypeDeviceM').val(),"model":$('#selectModelDeviceM').val(),"macaddress":$('#inputMacDeviceM').val(),"frequency":$('#inputFrequencyDeviceM').val(),"kind":$('#selectKindDeviceM').val(),"protocol":$('#selectProtocolDeviceM').val(),"format":$('#selectFormatDeviceM').val(),"latitude":$('#inputLatitudeDeviceM').val(),"longitude":$('#inputLongitudeDeviceM').val(),"visibility":$('#selectVisibilityDeviceM').val(),"k1":$('#KeyOneDeviceUserM').val(), "k2":$('#KeyTwoDeviceUserM').val(),"producer":$('#inputProducerDeviceM').val(),"edge_gateway_type":$('#selectEdgeGatewayTypeM').val(),"edge_gateway_uri": $('#inputEdgeGatewayUriM').val(), "deviceValues":arrayAttributes};
+			 var updatedDevice={"contextbroker":$('#selectContextBrokerM').val(),"name":$('#inputNameDeviceM').val(),"devicetype":$('#inputTypeDeviceM').val(),"model":$('#selectModelDeviceM').val(),"macaddress":$('#inputMacDeviceM').val(),"frequency":$('#inputFrequencyDeviceM').val(),"kind":$('#selectKindDeviceM').val(),"protocol":$('#selectProtocolDeviceM').val(),"format":$('#selectFormatDeviceM').val(),"service":$('#deviceService').val(),"servicepath":$('#editInputServicePathDevice').val(),"latitude":$('#inputLatitudeDeviceM').val(),"longitude":$('#inputLongitudeDeviceM').val(),"visibility":$('#selectVisibilityDeviceM').val(),"k1":$('#KeyOneDeviceUserM').val(), "k2":$('#KeyTwoDeviceUserM').val(),"producer":$('#inputProducerDeviceM').val(),"edge_gateway_type":$('#selectEdgeGatewayTypeM').val(),"edge_gateway_uri": $('#inputEdgeGatewayUriM').val(), "deviceValues":arrayAttributes};
 			 
 			 var device_status = 'invalid';
 			 var verify = verifyDevice(updatedDevice);
@@ -2308,6 +2329,8 @@ error messages returned by verifyDevice are longer.
 		    uri: $('#inputUriDeviceM').val(),
 		    protocol:updatedDevice.protocol ,
 		    format: updatedDevice.format,
+			service: updatedDevice.service,
+			servicepath: updatedDevice.servicepath,
 		    mac: updatedDevice.macaddress,
 		    model: updatedDevice.model,
 		    producer: updatedDevice.producer,
@@ -2381,6 +2404,8 @@ error messages returned by verifyDevice are longer.
 							  $('#inputLongitudeDevice').val("");
 							  $('#selectVisibilityDevice').val();
 							  $('#inputFrequencyDevice').val();
+								$('#deviceService').val("");
+								$('#editInputServicePathDevice').val("");
 								
 							   $('#editDeviceModal').hide();
 							   setTimeout(updateDeviceTimeout, 100);	  
@@ -2429,6 +2454,8 @@ error messages returned by verifyDevice are longer.
 				  $('#inputLongitudeDevice').val("");
 				  $('#selectVisibilityDevice').val();
 				  $('#inputFrequencyDevice').val();
+					 $('#deviceService').val("");
+					 $('#editInputServicePathDevice').val("");
 									
 				   $('#editDeviceModal').hide();
 				   setTimeout(updateDeviceTimeout, 3000);
@@ -2468,6 +2495,8 @@ error messages returned by verifyDevice are longer.
 		      $("#KeyTwoDeviceUser").val("");
 			  $("#KeyOneDeviceUserMsg").html("");
 			  $("#KeyTwoDeviceUserMsg").html("");
+				$('#deviceService').val("");
+				$('#editInputServicePathDevice').val("");
 			  $('#addDeviceModal').modal('hide'); 
 			  
 			  //.hide();
@@ -3901,7 +3930,7 @@ function verifyDevice(deviceToverify){
                         attr_msg = attr_msg+ " value_unit";
                 }				
 				//Sara3010 - End
-                if(v.value_type==undefined || v.value_type==""|| gb_value_types.indexOf(v.value_type)<0){
+                if(v.value_type==undefined || v.value_type==""){
                         attr_status=false;
                         attr_msg =attr_msg+ " value_type";
                 }

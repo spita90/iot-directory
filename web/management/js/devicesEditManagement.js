@@ -25,9 +25,9 @@ function showEditDeviceModal()
 
 	$("#editGeoPositionTabDevice #inputLongitudeDeviceM").on('input', function(){checkEditDeviceLongitude(); checkEditDeviceConditions();}); 
 	
-	
-	$("#editInfoTabDevice #inputMacDeviceM").on('input', function(){checkEditDeviceMAC(); checkEditDeviceConditions();}); 
-    
+
+	$("#editInfoTabDevice #inputMacDeviceM").on('input', function(){checkEditDeviceMAC(); checkEditDeviceConditions();});
+
     //$("#editInfoTabDevice #KeyOneDeviceUserM").on('input', function(){UserEditKey(); checkEditDeviceConditions();}); 
     //$("#editInfoTabDevice #KeyOneDeviceUserM").change(function(){UserEditKey(); checkEditDeviceConditions();});
     
@@ -35,7 +35,7 @@ function showEditDeviceModal()
     //$("#editInfoTabDevice #KeyTwoDeviceUserM").change( function(){UserEditKey(); checkEditDeviceConditions();}); 
     
     //$("#editInfoTabDevice #editDeviceGenerateKeyBtn").on('click',function(){UserEditKey(); checkEditDeviceConditions();});
-	
+
 	
 	checkEditDeviceName();
 	checkEditDeviceType();
@@ -282,6 +282,8 @@ function checkEditDeviceConditions()
                 editDeviceConditionsArray['specialChars'] = false;
         }
 
+        //TODO FIX
+        /*
         //check that any value has a value type selected
         var p = $('#editSchemaTabDevice #editlistAttributes select[id*="value_type"]').filter(function(){return this.value!=="NOT VALID OPTION"}).length;
 	var px = $('#editSchemaTabDevice #addlistAttributesM select[id*="value_type"]').filter(function(){return this.value!=="NOT VALID OPTION"}).length;
@@ -309,6 +311,7 @@ function checkEditDeviceConditions()
         {
                 editDeviceConditionsArray['attributeWithValueUnit'] = false;
         }
+         */
 
     var enableButton = true;
 	

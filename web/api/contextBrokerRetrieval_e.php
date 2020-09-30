@@ -216,7 +216,7 @@ else if ($action=="get_temporary_devices"){
 	$username = md5($username);
 
 	$q = "SELECT contextBroker, id, devicetype, model, status, macaddress,frequency,kind, 
-	 protocol,format,latitude, longitude, visibility, k1, k2,producer, edge_gateway_type, edge_gateway_uri, validity_msg, should_be_registered
+	 protocol,format,latitude, longitude, visibility, k1, k2,producer, edge_gateway_type, edge_gateway_uri, validity_msg, should_be_registered, service, servicePath
 	FROM temporary_devices"; // WHERE username = '$username' AND deleted IS null;";
 	//$r = mysqli_query($link, $q);	
 	$r=create_datatable_data($link,$_REQUEST,$q, "deleted IS null AND should_be_registered='no' AND username = '$username' AND organization='$organization'");
@@ -256,6 +256,8 @@ else if ($action=="get_temporary_devices"){
 				$rec["kind"]=$row["kind"];
 				$rec["protocol"]=$row["protocol"];
 				$rec["format"]=$row["format"];
+				$rec["service"]=$row["service"];
+				$rec["servicepath"]=$row["servicePath"];
 				$rec["latitude"]=$row["latitude"];
 				$rec["longitude"]=$row["longitude"];
 				$rec["visibility"]=$row["visibility"];
@@ -337,7 +339,9 @@ else if ($action=="update")
 	$old_contextbroker = mysqli_real_escape_string($link, $_REQUEST['old_cb']);  
 	$kind = mysqli_real_escape_string($link, $_REQUEST['kind']);  
 	$protocol = mysqli_real_escape_string($link, $_REQUEST['protocol']);  
-	$format = mysqli_real_escape_string($link, $_REQUEST['format']);  
+	$format = mysqli_real_escape_string($link, $_REQUEST['format']);
+	$service = mysqli_real_escape_string($link, $_REQUEST['service']);
+	$servicepath = mysqli_real_escape_string($link, $_REQUEST['servicepath']);
 	$macaddress = mysqli_real_escape_string($link, $_REQUEST['mac']);  
 	$model = mysqli_real_escape_string($link, $_REQUEST['model']);  
 	$producer = mysqli_real_escape_string($link, $_REQUEST['producer']);  
@@ -412,7 +416,9 @@ else if ($action=="update")
 			devicetype='$devicetype', 
 			kind= '$kind', 
 			protocol='$protocol', 
-			format='$format', 
+			format='$format',
+			service='$service',
+			servicePath='$servicepath',
 			macaddress='$macaddress', 
 			model='$model', 
 			producer='$producer', 
@@ -433,7 +439,7 @@ else if ($action=="update")
 
 			if($r) 
 			{
-				$result["msg"] .= "\n Device $contextbroker/$id correctly updatedd " .count($listAttributes);
+				$result["msg"] .= "\n Device $contextbroker/$id correctly updated " .count($listAttributes);
 				$result["log"] .= "\r\n Device $contextbroker/$id correctly updated log ".count($listAttributes);
 
 				//Sara2510 - for logging purpose
@@ -582,25 +588,30 @@ else if ($action=="update")
 else if ($action=="bulkload")
 {
 	$time_start = microtime(true);
-			  if (isset($node_data->token)) {
+			  if (isset($_REQUEST['token'])) {
 			  $oidc = new OpenIDConnectClient($keycloakHostUri, $clientId, $clientSecret);
 			  $oidc->providerConfigParam(array('token_endpoint' => $keycloakHostUri.'/auth/realms/master/protocol/openid-connect/token'));
 
-			  $tkn = $oidc->refreshToken($node_data->token);
+			  $tkn = $oidc->refreshToken($_REQUEST['token']);
 			  $accessToken = $tkn->access_token; 
 			}
 			else $accessToken ="";
 			
 
-			if (isset($node_data->username)) {
-				$currentUser = $node_data->username;
+			if (isset($_REQUEST['username'])) {
+				$currentUser = $_REQUEST['username'];
 			}
-  
-  $username = mysqli_real_escape_string($link,$node_data->username);
-  $organization = mysqli_real_escape_string($link,$node_data->organization);
-  $kbUrl = mysqli_real_escape_string($link,$node_data->kbUrl);
+
+  $username = $_REQUEST['username'];
+
+
+  $organization = $_REQUEST['organization'];
+  $kbUrl = $_REQUEST['kbUrl'];
   $usernameNotHashed = $username;
   $username = md5($username);
+
+  $result["log"] = "USERNAME: ".$username." org: ".$organization." kbUrl: ".$kbUrl." token: ".$accessToken;
+  my_log($result);
 
   
    //asynchBulk('../api/asynchBulk.php',array('username'=>$username,'link'=>$link, 'pathCertificate'=>$pathCertificate, 'accessToken'=>$accessToken));
@@ -620,15 +631,15 @@ else if ($action=="bulkload")
     
     try{
     //---update the bulk_status table that the bulk is processing----------
-    $qupdate= "INSERT INTO bulkload_status (username, is_bulk_processing, number_processed,totale, is_finished ) VALUES('".$username."', 1, 0,".$totalValid.", 0) ON DUPLICATE KEY UPDATE is_bulk_processing=1, number_processed=0, totale=".$totalValid.", is_finished=0;";
+    $qupdate= "INSERT INTO bulkload_status (username, is_bulk_processing, number_processed,totale, is_finished ) VALUES('$username', 1, 0,".$totalValid.", 0) ON DUPLICATE KEY UPDATE is_bulk_processing=1, number_processed=0, totale=".$totalValid.", is_finished=0;";
     $b=mysqli_query($link, $qupdate);
     //-----------------------------------------------
 
 	
 	$q = "SELECT contextBroker, id, devicetype, model, status, macaddress,frequency,kind, 
 	 protocol,format,latitude, longitude, visibility, k1, k2,producer, edge_gateway_type, edge_gateway_uri, 
-	 validity_msg, subnature, static_attributes FROM temporary_devices WHERE username = '$username' 
-	 AND deleted IS null AND organization='$organization' AND  should_be_registered='no';";
+	 validity_msg, subnature, static_attributes, service, servicePath FROM temporary_devices WHERE username = '$username'
+	 AND deleted IS null AND organization='$organization' AND  should_be_registered='no'";
 	$r = mysqli_query($link, $q);	
 	
     $resultInfo = array();
@@ -661,11 +672,11 @@ else if ($action=="bulkload")
                          $counter=0;
                         
                         //---update the bulk_status table----------
-                    $qupdate= "UPDATE bulkload_status SET  number_processed=".$numberValidProcessed." WHERE username = '".$username."';";
+                    $qupdate= "UPDATE bulkload_status SET  number_processed=".$numberValidProcessed." WHERE username = '$username';";
                         mysqli_query($link, $qupdate);
                         //-----------------------------------------------
                         
-                    $qcontinue= "select is_bulk_processing from bulkload_status where username= '".$username."';";
+                    $qcontinue= "select is_bulk_processing from bulkload_status where username= '$username';";
                     $rc= mysqli_query($link, $qcontinue);
                         if($rc){
                            $row_continue = mysqli_fetch_assoc($rc);
@@ -712,7 +723,7 @@ else if ($action=="bulkload")
 						$row["macaddress"],$row["model"],$row["producer"],$row["latitude"],$row["longitude"],
 						$row["visibility"], $row["frequency"], $row["k1"], $row["k2"], $row["edge_gateway_type"],
 						$row["edge_gateway_uri"],json_decode(json_encode($deviceattributes)),$row["subnature"],$row["static_attributes"],$pathCertificate,
-						$accessToken,$result,'no',$organization,$kbUrl,$username);
+						$accessToken,$result,'no',$organization,$kbUrl,$username,$row["service"],$row["servicePath"]);
 						
 					   //Sara2210
 						$deviceName = $row["id"] . " ".$row["contextBroker"];
@@ -754,7 +765,7 @@ else if ($action=="bulkload")
 							}
 							 else
 							 {
-							 logAction($link,$usernameNotHashed,'temporary_devices','bulkload update deleted',$deviceName,$organization,'Problem in deleting the device','faliure');
+							 logAction($link,$usernameNotHashed,'temporary_devices','bulkload update deleted',$deviceName,$organization,'Problem in deleting the device','failure');
 							  $result["status"]='ko';
 							  $result["msg"] .= "\n Problem in deleting the device $id: " . generateErrorMessage($link); 
 							  $result["log"] .= "\n Problem in deleting the device $id: " . generateErrorMessage($link);
@@ -765,14 +776,14 @@ else if ($action=="bulkload")
 					   }
 					   else if($result["status"]=="ko"){
 							//Sara2210
-							logAction($link,$usernameNotHashed,'device','bulkload',$deviceName,$organization,$result["msg"],'faliure');							   
+							logAction($link,$usernameNotHashed,'device','bulkload',$deviceName,$organization,$result["msg"],'failure');
 							$rec["inserted"]="ko";
 						}
 					}
 					else
 					{
 						//Sara2210
-						logAction($link,$usernameNotHashed,'device','bulkload','',$organization,'Error: errors in reading data about devices.','faliure');
+						logAction($link,$usernameNotHashed,'device','bulkload','',$organization,'Error: errors in reading data about devices.','failure');
 						$result['status'] = 'ko'; // . $q1 . generateErrorMessage($link);
 						$result['msg'] .= 'CCC Error: errors in reading data about devices. <br/>' .
 										  generateErrorMessage($link);
@@ -785,7 +796,7 @@ else if ($action=="bulkload")
                  
                  if($numberValidProcessed==$totalValid){
 						//---update the bulk_status table----------
-						$qupdate= "UPDATE bulkload_status SET  is_bulk_processing=0, number_processed=0, totale=0, is_finished=1 WHERE username = '".$username."';";
+						$qupdate= "UPDATE bulkload_status SET  is_bulk_processing=0, number_processed=0, totale=0, is_finished=1 WHERE username = '$username';";
 						$b=mysqli_query($link, $qupdate);
 					}
 					
@@ -823,14 +834,14 @@ else if ($action=="bulkload")
 	my_log($result);
     
     //---update the bulk_status table----------
-    $qupdate= "UPDATE bulkload_status SET  is_bulk_processing=0, number_processed=0, totale=0, is_finished=1 WHERE username = '".$username."';";
+    $qupdate= "UPDATE bulkload_status SET  is_bulk_processing=0, number_processed=0, totale=0, is_finished=1 WHERE username = '$username';";
     $b=mysqli_query($link, $qupdate);
     //-----------------------------------------------
 
 		mysqli_close($link);
     }
     catch (Exception $e) {
-        $qupdate= "UPDATE bulkload_status SET  is_bulk_processing=0, number_processed=0, totale=0 WHERE username = '".$username."';";
+        $qupdate= "UPDATE bulkload_status SET  is_bulk_processing=0, number_processed=0, totale=0 WHERE username = '$username';";
         $b=mysqli_query($link, $qupdate);
          mysqli_close($link);
     }
@@ -839,7 +850,7 @@ else if ($action=="get_bulk_status")
 {
     $username = mysqli_real_escape_string($link,$_REQUEST['username']);
     $username=md5($username);
-    $query = "SELECT is_bulk_processing, number_processed, totale, is_finished FROM bulkload_status  WHERE username = '".$username."';";
+    $query = "SELECT is_bulk_processing, number_processed, totale, is_finished FROM bulkload_status  WHERE username = '$username';";
     $r = mysqli_query($link, $query);
 
      if($r)
@@ -869,7 +880,7 @@ else if ($action=="stop_bulk")
     $username = mysqli_real_escape_string($link,$_REQUEST['username']);
     $username=md5($username);
     
-    $query= "UPDATE bulkload_status SET  is_bulk_processing=0, number_processed=0, totale=0 WHERE username = '".$username."';";
+    $query= "UPDATE bulkload_status SET  is_bulk_processing=0, number_processed=0, totale=0 WHERE username = '$username';";
     $r=mysqli_query($link, $query);
    
 

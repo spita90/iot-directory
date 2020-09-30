@@ -114,7 +114,7 @@ router.route('/ngsi')
 	}  
 });
 
-router.route('/ngsi w/Multiservice')
+router.route('/ngsi%20w/Multiservice')
 	.post(function(req, res) {
 		var args = [];
 
@@ -148,8 +148,7 @@ router.route('/ngsi w/Multiservice')
 		{
 			console.log("Retrieval from "+ req.body.contextbroker + " activated.");
 			//registeredStub.push(req.body.contextbroker);
-			//TODO implement Multitenancy-ServicePath
-			args= ['./snap4cityBroker/ngsi2IoTDirectory_rw.js',
+			args= ['./snap4cityBroker/ngsiMTSP2IoTDirectory_rw.js',
 				req.body.contextbroker,
 				req.body.ip,
 				req.body.user,

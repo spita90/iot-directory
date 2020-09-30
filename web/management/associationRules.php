@@ -346,7 +346,7 @@ else
                                     <div class="col-md-12 centerWithFlex pageSingleDataCnt">
                                          <?php
                                             $u= md5($_SESSION['loggedUsername']);
-											$query = "SELECT count(*) AS qt FROM temporary_devices WHERE status='valid' AND username ='".$u."' AND should_be_registered= 'no' AND deleted IS null";
+											$query = "SELECT count(*) AS qt FROM temporary_devices WHERE status='valid' AND username ='$u' AND should_be_registered= 'no' AND deleted IS null";
                                             $result = mysqli_query($link, $query);
                                             
                                             if($result)
@@ -366,7 +366,7 @@ else
                                     <div class="col-md-12 centerWithFlex pageSingleDataCnt">
                                        		<?php //MM
                                             $u= md5($_SESSION['loggedUsername']);
-											$query = "SELECT count(*) AS qt FROM temporary_devices WHERE status='invalid' AND should_be_registered= 'no' AND username ='".$u."' AND deleted IS null";
+											$query = "SELECT count(*) AS qt FROM temporary_devices WHERE status='invalid' AND should_be_registered= 'no' AND username ='$u' AND deleted IS null";
                                             $result = mysqli_query($link, $query);
                                             
                                             if($result)
@@ -1057,7 +1057,7 @@ else
                                     <div class="modalFieldCnt">
                                         <select id="selectContextBrokerM" name="selectContextBrokerM" class="modalInputTxt">
 										<?php
-                                            $query = "SELECT name FROM contextbroker";
+                                            $query = "SELECT name FROM contextbroker WHERE kind like 'external'";
                                             $result = mysqli_query($link, $query);
 
                                             if($result)
@@ -1104,6 +1104,7 @@ else
 											<option value="coap">coap</option>
 											<option value="mqtt">mqtt</option>
 											<option value="ngsi">ngsi</option>
+											<option value="ngsi w/MultiService">ngsi w/MultiService</option>
 										</select>
                                     </div>
                                     <div class="modalFieldLabelCnt">Protocol</div>
@@ -1122,7 +1123,27 @@ else
                                 </div>
                                
 							</div>
-				 
+
+				 <!-- Start MultiService + ServicePath Section -->
+                                     				<div class = "row" id = "editMultiServiceAndServicePath">
+                                     					<div class="col-xs-12 col-md-6 modalCell">
+                                                             	            <div class="modalFieldCnt">
+                                                                     	        <input type="text" class="modalInputTxt" name="deviceService" id="deviceService" required>
+                                     	                                    </div>
+                                             	                            <div id="editSelectServiceLabel" class="modalFieldLabelCnt">Service/Tenant</div>
+                                     					    <div id="editSelectServiceMsg" class="modalFieldMsgCnt">&nbsp;</div>
+                                     	                                </div>
+
+                                     					<div class="col-xs-12 col-md-6 modalCell">
+                                     						<div class="modalFieldCnt">
+                                                     		                        <input type="text" class="modalInputTxt" name="editInputServicePathDevice" id="editInputServicePathDevice" required>
+                                                                     		</div>
+                                     		                                <div id="editInputServicePathLabel" class="modalFieldLabelCnt">ServicePath</div>
+                                     						<div id="editInputServicePathMsg" class="modalFieldMsgCnt">&nbsp;</div>
+                                             	                        </div>
+                                     				</div>
+                                     				<!-- End MultiService + ServicePath Section -->
+
                         </div>
                           <!-- Info tab -->
                         <div id="editInfoTabDevice" class="tab-pane fade">
