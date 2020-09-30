@@ -609,10 +609,6 @@ else if ($action=="bulkload")
   $kbUrl = $_REQUEST['kbUrl'];
   $usernameNotHashed = $username;
   $username = md5($username);
-
-  $result["log"] = "USERNAME: ".$username." org: ".$organization." kbUrl: ".$kbUrl." token: ".$accessToken;
-  my_log($result);
-
   
    //asynchBulk('../api/asynchBulk.php',array('username'=>$username,'link'=>$link, 'pathCertificate'=>$pathCertificate, 'accessToken'=>$accessToken));
 
