@@ -252,9 +252,6 @@ function format ( d ) {
     $(document).ready(function () 
     {
 	
-//default hide Subscription tab
-//TODO
-	
 //fetch_data function will load the contextbroker table 	
 		fetch_data(false);	
 		//aggiornaStub();
@@ -736,6 +733,10 @@ function format ( d ) {
 			}
 
 			 */
+			if($(this).attr("data-kind") === "internal"){
+				$('#selectUrlOrionCallbackMsgHint').hide();
+			}
+
 			editCBSManagementButtonPressed($(this).attr("data-services"));
 			showEditCbModal();
 	});
@@ -1311,7 +1312,7 @@ function format ( d ) {
 	
 		if(value ==='internal')
 		{
-
+			$("#selectUrlOrionCallbackMsgHint").hide();
 			$("#loginExternal").hide();
 			$("#loginInternal").show();
 			document.getElementById("inputApiKeyCB").value = '';
@@ -1320,6 +1321,7 @@ function format ( d ) {
 		} 
 		else if(value ==='external')
 		{
+			$("#selectUrlOrionCallbackMsgHint").show();
 			$("#loginInternal").hide();
 			$("#loginExternal").show();
 			document.getElementById("inputLoginCB").value = '';
