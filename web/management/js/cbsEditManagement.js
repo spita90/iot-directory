@@ -10,7 +10,7 @@ function showEditCbModal()
     editCbConditionsArray['inputPortCBM'] = false;
     editCbConditionsArray['inputLatitudeCBM'] = false;
     editCbConditionsArray['inputLongitudeCBM'] = false;
-    editCbConditionsArray['inputUrlOrionCallbackM'] = false;
+    editCbConditionsArray['inputUrlOrionCallbackM'] = true;
 	
 	$("#editInfoTabCB #inputIpCBM").on('input', checkEditCbIp);
 	$("#editInfoTabCB #inputIpCBM").on('input', checkEditCbConditions);
