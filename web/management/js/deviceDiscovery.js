@@ -143,13 +143,19 @@ $('#startDiscoveryButton').click( function() {
 					for (let j = 0; j < cbs[i].tenants.length; j++) {
 						for (let k = 0; k < cbs[i].tenants[j].servicePaths.length; k++) {
 							let path = cbs[i].tenants[j].servicePaths[k];
-							let slashes = (path.split("/")).length - 2;
+							let slashes = (path.split("/")).length - 1;
 							for (let w = 0; w < slashes; w++) {
 								path = path.substring(0, path.lastIndexOf("/"));
 								if (!cbs[i].tenants[j].servicePaths.includes(path)) {
-									cbs[i].tenants[j].servicePaths.push(path);
-									k = 0;
-									console.log("Path inferred: " + path + " in CB: " + cbs[i].name + ", tenant: " + cbs[i].tenants[j].name);
+									if((path == "/" || path == "") && (!cbs[i].tenants[j].servicePaths.includes("") && !cbs[i].tenants[j].servicePaths.includes("/"))){
+										cbs[i].tenants[j].servicePaths.push(path);
+										k = 0;
+										console.log("Path inferred: " + path + " in CB: " + cbs[i].name + ", tenant: " + cbs[i].tenants[j].name);
+									}else if (path!="" && path!="/"){
+										cbs[i].tenants[j].servicePaths.push(path);
+										k = 0;
+										console.log("Path inferred: " + path + " in CB: " + cbs[i].name + ", tenant: " + cbs[i].tenants[j].name);
+									}
 								}
 							}
 						}

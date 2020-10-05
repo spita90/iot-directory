@@ -27,6 +27,8 @@ var gb_value_units=[];
 var gb_datatypes=[];
 var gb_value_types = [];
 
+var schema;
+
 var express = require('express');
 var request = require('request');
 var bodyParser = require('body-parser');
@@ -102,9 +104,9 @@ req.open("POST", connLink, true);
 req.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         //console.log("tenants/paths structure retrieved");
-        var content = JSON.parse(this.responseText)["content"];
-        if(content.length>0) {
-            inferImplicitPaths(content);
+        schema = JSON.parse(this.responseText)["content"];
+        if(schema.length>0) {
+            inferImplicitPaths(schema);
         }else{
             console.log("Empty response!");
         }
@@ -118,7 +120,7 @@ function inferImplicitPaths(schema){
     for(let i=0; i<schema.length; i++){
         let tenant = schema[i].service;
         let path = schema[i].servicePath;
-        let slashes = (path.split("/")).length - 2;
+        let slashes = (path.split("/")).length - 1;
         for (let j = 0; j < slashes; j++) {
             let found = false;
             path = path.substring(0, path.lastIndexOf("/"));
@@ -168,6 +170,10 @@ function retrieveDevices(schema){
 
     //console.log(link);
 
+    retrieveDataCaller(schema);
+}
+
+function retrieveDataCaller(schema){
     for (let i=0;i<schema.length;i++){
 
         var xhttp = new XMLHttpRequest();
@@ -175,7 +181,6 @@ function retrieveDevices(schema){
 
     }
 }
-
 
 function retrieveData(xhttp, link, service, servicePath){
 
@@ -889,3 +894,7 @@ Array.prototype.removeDuplicatesSchema = function( arr ) {
         return arr.indexOf( val ) < 0;
     });
 };
+
+var requestLoop = setInterval(function(){
+    retrieveDataCaller(schema);
+}, 20000);

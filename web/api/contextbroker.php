@@ -259,6 +259,7 @@ if ($action=="update")
 		// we do: old_services - new_services. the result contains the removed services
 		// we then check if we have one or more devices with a removed service
 		// if there are such devices, then throw error and abort
+		//also we handle nifi subscriptions
 
 		$q ="SELECT name FROM iotdb.services where broker_name='$name'";
 	    $r = mysqli_query($link, $q);
@@ -266,6 +267,8 @@ if ($action=="update")
 	    if($r){
 	        $old_services = [];
 	        $removed_services = [];
+	        $added_services = [];
+
 	        while($row = mysqli_fetch_assoc($r))
                 {
                     array_push($old_services, $row["name"]);
@@ -280,48 +283,92 @@ if ($action=="update")
         	for($i = 0; $i<count($removed_services);$i++){
         	    $result["log"] = "REMOVED SERVICE: ".$removed_services[$i];
                 my_log($result);
+
         	}
 
-            $a ="SELECT count(*) as count FROM iotdb.devices WHERE contextBroker = '$name' AND (";
-
-        	for($i = 0; $i<count($removed_services);$i++){
-        	    $serv = $removed_services[$i];
-                $a = $a."service = '".$removed_services[$i]."' OR ";
-
-        	 }
-        	 $a = substr($a,0,-4);
-        	 $a =$a.")";
-
-	        $result["log"] = "QUERY: '$a'";
-              my_log($result);
-
-        	$z = mysqli_query($link, $a);
-
-            $error_costrain_service = false;
-
-            if($z){
-                $row = mysqli_fetch_assoc($z);
-                $count = $row["count"];
-                if($count>0){
-                    $error_costrain_service = true;
-                    $result["log"] = "RESULT: R>0";
-                    my_log($result);
+        	for($i = 0; $i < count($services); $i++){
+                if(!in_array($services[$i], $old_services)){
+                    array_push($added_services, $services[$i]);
                 }
-            }else{
-            $error_costrain_service = true;
-            $result["log"] = "NO RESULT!";
-                          my_log($result);
             }
 
-        	if($error_costrain_service == true){
-                logAction($link,$username,'contextbroker','update',$name,$organization,'One or more devices are associated with a deleted Service. Cannot continue','failure');
-                $result["status"]='ko';
-                $result["error_msg"] = "One or more devices are associated with a deleted Service. Cannot continue" ;
-                $result["log"] = "\n\r Error: One or more devices are associated with a deleted Service. Cannot continue <br/>" .
-                $result["msg"] = "Error: One or more devices are associated with a deleted Service. Cannot continue. <br/>";
-        	}else{
-        	    $result["status"]='ok';
-        	}
+            for($i = 0; $i<count($added_services);$i++){
+                $result["log"] = "ADDED SERVICE: ".$added_services[$i];
+                my_log($result);
+            }
+
+            if(count($removed_services) >0 || count($added_services) > 0){
+                nificallback_delete($old_ip, $old_port, $old_subscription_id, $name, $protocol, $services, $result);
+                my_log($result);
+                nificallback_create($ip, $port, $name, $urlnificallback, $protocol, $services, $result);
+                my_log($result);
+
+                //and now update db
+                $q = "UPDATE contextbroker SET subscription_id='".$result["content"]."' WHERE name='$name';";
+                $r = mysqli_query($link, $q);
+            if($r)
+                {
+                    logAction($link,$username,'contextbroker','insert',$name,$organization,'Subscribe URL NIFI CALLBACK','success');
+                        $result["status"]='ok';
+                        $result["log"].='\n\r action: subscribe ok. ' . $q;
+                }
+                    else
+                {
+                        logAction($link,$username,'contextbroker','insert',$name,$organization,'Subscribe URL NIFI CALLBACK','failure');
+                        $result["status"]='ko';
+                        $result["error_msg"] = "Error occurred when registering the subscription" ;
+                        $result["log"] = "\n\r Error: An error occurred when subscription <br/>" .
+                        $result["msg"] = "Error: An error occurred when subscribe $name. <br/>" .
+                                           mysqli_error($link) .
+                                           ' Please enter again the context broker';
+                    }
+            }
+
+            if(count($removed_services)>0){
+                $a ="SELECT count(*) as count FROM iotdb.devices WHERE contextBroker = '$name' AND (";
+
+                        	for($i = 0; $i<count($removed_services);$i++){
+                        	    $serv = $removed_services[$i];
+                                $a = $a."service = '".$removed_services[$i]."' OR ";
+
+                        	 }
+                        	 $a = substr($a,0,-4);
+                        	 $a =$a.")";
+
+                	        $result["log"] = "QUERY: '$a'";
+                              my_log($result);
+
+                        	$z = mysqli_query($link, $a);
+
+                            $error_costrain_service = false;
+
+                            if($z){
+                                $row = mysqli_fetch_assoc($z);
+                                $count = $row["count"];
+                                if($count>0){
+                                    $error_costrain_service = true;
+                                    $result["log"] = "RESULT: R>0";
+                                    my_log($result);
+                                }
+                            }else{
+                            $error_costrain_service = true;
+                            $result["log"] = "NO RESULT!";
+                                          my_log($result);
+                            }
+
+                        	if($error_costrain_service == true){
+                                logAction($link,$username,'contextbroker','update',$name,$organization,'One or more devices are associated with a deleted Service. Cannot continue','failure');
+                                $result["status"]='ko';
+                                $result["error_msg"] = "One or more devices are associated with a deleted Service. Cannot continue" ;
+                                $result["log"] = "\n\r Error: One or more devices are associated with a deleted Service. Cannot continue <br/>" .
+                                $result["msg"] = "Error: One or more devices are associated with a deleted Service. Cannot continue. <br/>";
+                        	}else{
+                        	    $result["status"]='ok';
+                        	}
+
+            }else{
+               $result["status"]='ok';
+            }
 
 	    }else{
 	        $result["status"]='ok';
