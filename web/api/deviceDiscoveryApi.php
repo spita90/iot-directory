@@ -130,6 +130,11 @@ if ($action=="getCBServiceTrees") {
                   FROM contextbroker c LEFT JOIN services s ON c.name = s.broker_name
                   WHERE c.protocol LIKE 'ngsi w/MultiService'
                     AND c.kind LIKE 'external'
+                  UNION
+                    SELECT DISTINCT c.name as contextBroker, c.ip, c.port, c.accesslink, c.accessport, c.path, c.login, c.password, '' as service, '/' as servicePath
+                    FROM contextbroker c
+                    WHERE c.protocol LIKE 'ngsi w/MultiService'
+                      AND c.kind LIKE 'external'
                   ORDER BY contextBroker, service, servicePath";
             $r = mysqli_query($link, $q);
 
@@ -221,7 +226,11 @@ else if ($action=="getCBServiceTree") {
                UNION
                SELECT DISTINCT s.name as service, '/' as servicePath
                FROM contextbroker c LEFT JOIN services s ON c.name = s.broker_name
-               WHERE c.name LIKE 'MT_SP_ExternalContextBroker'
+               WHERE c.name LIKE '$contextbroker'
+               UNION
+                  SELECT DISTINCT '' as service, '/' as servicePath
+                  FROM contextbroker c
+                  WHERE c.name LIKE '$contextbroker'
                ORDER BY service, servicePath";
          $r = mysqli_query($link, $q);
 
